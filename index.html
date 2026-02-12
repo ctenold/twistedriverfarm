@@ -37,34 +37,35 @@
 
   /* Crop labels (permanent, vertical) */
   .crop-tooltip {
-    background: rgba(44, 30, 15, 0.85) !important;
-    border: 1px solid rgba(139, 196, 122, 0.6) !important;
-    color: #b5e8a5 !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    color: #000000 !important;
     font-family: 'DM Sans', sans-serif !important;
-    font-size: 10px !important;
+    font-size: 13px !important;
     font-weight: 700 !important;
-    padding: 4px 6px !important;
-    border-radius: 4px !important;
+    padding: 3px 6px !important;
+    border-radius: 3px !important;
     white-space: nowrap !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4) !important;
     writing-mode: vertical-rl !important;
     text-orientation: mixed !important;
     letter-spacing: 0.5px !important;
+    line-height: 1 !important;
   }
   .crop-tooltip::before { display: none !important; }
 
   /* Lane labels (hover only) */
   .lane-tooltip {
-    background: rgba(44, 30, 15, 0.85) !important;
-    border: 1px solid rgba(200, 184, 150, 0.5) !important;
-    color: #c8b896 !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    color: #000000 !important;
     font-family: 'DM Sans', sans-serif !important;
-    font-size: 9px !important;
+    font-size: 12px !important;
     font-weight: 600 !important;
-    padding: 3px 6px !important;
-    border-radius: 4px !important;
+    padding: 4px 8px !important;
+    border-radius: 3px !important;
     white-space: nowrap !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4) !important;
   }
   .lane-tooltip::before { display: none !important; }
 
@@ -348,26 +349,50 @@
   #import-input { display: none; }
 
   .dim-tooltip {
-    background: rgba(0,0,0,0.7) !important;
-    border: none !important; color: #fff !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    color: #000000 !important;
     font-family: 'DM Sans', sans-serif !important;
-    font-size: 9px !important; font-weight: 600 !important;
-    padding: 2px 5px !important; border-radius: 3px !important;
-    white-space: nowrap !important; box-shadow: none !important;
+    font-size: 12px !important; font-weight: 700 !important;
+    padding: 3px 7px !important; border-radius: 3px !important;
+    white-space: nowrap !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4) !important;
   }
   .dim-tooltip::before { display: none !important; }
 
   /* Inactive field name tooltip */
   .inactive-field-tooltip {
-    background: rgba(44, 30, 15, 0.85) !important;
-    border: 1px solid rgba(180,160,130,0.4) !important;
-    color: #c8b896 !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    color: #000000 !important;
     font-family: 'DM Sans', sans-serif !important;
-    font-size: 11px !important; font-weight: 600 !important;
-    padding: 4px 10px !important; border-radius: 5px !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+    font-size: 14px !important; font-weight: 700 !important;
+    padding: 5px 12px !important; border-radius: 4px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
   }
   .inactive-field-tooltip::before { display: none !important; }
+
+  /* Permanent inactive field name label */
+  .field-name-container {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: #ffffff;
+    white-space: nowrap;
+    cursor: pointer;
+    text-align: center;
+    letter-spacing: 0.5px;
+    background: rgba(20, 15, 10, 0.9);
+    padding: 6px 14px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.5);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 </style>
 </head>
 <body>
@@ -641,6 +666,15 @@ function escHtml(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+function getDaysAge(plantDate) {
+  if (!plantDate) return null;
+  const planted = new Date(plantDate + 'T00:00:00');
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const diff = Math.floor((today - planted) / 86400000);
+  return diff;
+}
+
 // --- Geo helpers ---
 function mPerDegLng(lat) {
   return 111320 * Math.cos(lat * Math.PI / 180);
@@ -855,6 +889,10 @@ function updateRowField(id, field, value) {
   } else if (field === 'length') {
     const v = parseFloat(value);
     if (!isNaN(v) && v > 0) { row.length = v; row.lengthOverride = true; }
+  } else if (field === 'plantDate') {
+    row.plantDate = value || null;
+  } else if (field === 'notes') {
+    row.notes = value || null;
   }
   saveState();
 }
@@ -936,6 +974,21 @@ function renderList() {
           title="Length (ft)" />
         <span class="row-dims">${row.width}×${row.length} ft</span>
       </div>
+      ${row.type === 'crop' ? `<div class="row-controls" style="margin-top:4px;">
+        <label style="font-size:10px;color:var(--bone);opacity:0.5;">Planted</label>
+        <input type="date" value="${row.plantDate || ''}"
+          onchange="updateRowField('${row.id}', 'plantDate', this.value)"
+          style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:var(--cream);padding:3px 6px;border-radius:4px;font-size:11px;font-family:'DM Sans',sans-serif;outline:none;color-scheme:dark;"
+          title="Plant date" />
+        ${(() => { const age = getDaysAge(row.plantDate); return age !== null ? '<span style="font-size:10px;color:#8bc47a;margin-left:auto;white-space:nowrap;">' + age + ' days old</span>' : ''; })()}
+      </div>
+      <div class="row-controls" style="margin-top:4px;">
+        <label style="font-size:10px;color:var(--bone);opacity:0.5;">Notes</label>
+        <input type="text" value="${escHtml(row.notes || '')}" placeholder="—"
+          onchange="updateRowField('${row.id}', 'notes', this.value)"
+          style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:var(--cream);padding:3px 6px;border-radius:4px;font-size:11px;font-family:'DM Sans',sans-serif;outline:none;text-align:left;width:auto;"
+          title="Notes" />
+      </div>` : ''}
     </div>
   `).join('');
 }
@@ -988,29 +1041,28 @@ function renderInactiveField(field) {
     color: 'rgba(200, 180, 140, 0.5)',
     weight: 2,
     dashArray: '8,5',
-    fillColor: 'rgba(180, 160, 130, 0.6)',
+    fillColor: 'rgba(180, 160, 130, 0.7)',
     fillOpacity: 1,
     opacity: 0.8
   }).addTo(map);
 
+  rect.bindTooltip(field.name, {
+    permanent: false, direction: 'top', className: 'inactive-field-tooltip'
+  });
   rect.on('click', function() { switchField(field.id); });
   inactiveLayers.push(rect);
 
   // Permanent field name label at center
   const center = getFieldCenter(field);
+  const fieldName = escHtml(field.name);
+  // Approximate size: 11px per char + padding, 36px height
+  const nameWidth = Math.max(80, fieldName.length * 11 + 28);
   const nameLabel = L.marker(center, {
     icon: L.divIcon({
-      className: '',
-      html: `<div style="
-        font-family: 'DM Sans', sans-serif;
-        font-size: 13px; font-weight: 700;
-        color: rgba(200, 184, 150, 0.8);
-        text-shadow: 0 0 6px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.6);
-        white-space: nowrap;
-        cursor: pointer;
-        text-align: center;
-      ">${escHtml(field.name)}</div>`,
-      iconSize: [0, 0], iconAnchor: [0, 0]
+      className: 'field-name-container',
+      html: fieldName,
+      iconSize: [nameWidth, 36],
+      iconAnchor: [nameWidth / 2, 18]
     }),
     interactive: true
   }).addTo(map);
@@ -1086,7 +1138,8 @@ function renderActiveField(field) {
     } else {
       const centerLat = (northLat + southLat) / 2;
       const centerLng = (westLng + eastLng) / 2;
-      // Vertical labels for vertical rows, horizontal for horizontal
+      const age = getDaysAge(row.plantDate);
+      const ageStr = age !== null ? ` (${age}d)` : '';
       const labelStyle = vert
         ? 'writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg);'
         : '';
@@ -1094,19 +1147,37 @@ function renderActiveField(field) {
         icon: L.divIcon({
           className: '',
           html: `<div style="
-            ${labelStyle}
+            position: absolute;
+            ${vert ? 'left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(180deg); writing-mode: vertical-rl; text-orientation: mixed;'
+                   : 'left: 50%; top: 50%; transform: translate(-50%, -50%);'}
             font-family: 'DM Sans', sans-serif;
-            font-size: 11px; font-weight: 700;
-            color: #b5e8a5;
-            text-shadow: 0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7);
+            font-size: 14px; font-weight: 700;
+            color: #000000;
             white-space: nowrap; pointer-events: none;
-            letter-spacing: 0.5px;
-          ">${escHtml(row.name)}</div>`,
+            letter-spacing: 0.3px;
+            background: #ffffff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            line-height: 1;
+          ">${escHtml(row.name)}&nbsp;&nbsp;&nbsp;&nbsp;${ageStr}</div>`,
           iconSize: [0, 0], iconAnchor: [0, 0]
         }),
         interactive: false
       }).addTo(map);
       activeLabelLayers.push(labelMarker);
+
+      // Hover tooltip showing plant date + notes
+      const tipParts = [];
+      if (row.plantDate) tipParts.push(`Planted: ${row.plantDate}`);
+      if (row.notes) tipParts.push(escHtml(row.notes));
+      if (tipParts.length) {
+        rect.bindTooltip(tipParts.join('<br>'), {
+          permanent: false, direction: 'top', className: 'lane-tooltip',
+          offset: [0, -10]
+        });
+      }
     }
 
     activeLayers.push(rect);

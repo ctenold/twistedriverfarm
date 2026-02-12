@@ -33,13 +33,9 @@
     overflow: hidden;
   }
 
-  #map {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-  }
+  #map { position: absolute; inset: 0; z-index: 1; }
 
-  /* Leaflet tooltip overrides — crop labels (permanent, vertical) */
+  /* Crop labels (permanent, vertical) */
   .crop-tooltip {
     background: rgba(44, 30, 15, 0.85) !important;
     border: 1px solid rgba(139, 196, 122, 0.6) !important;
@@ -74,96 +70,118 @@
 
   /* Side Panel */
   #panel {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 380px;
-    height: 100vh;
+    position: fixed; top: 0; right: 0;
+    width: 380px; height: 100vh;
     background: var(--panel-bg);
     backdrop-filter: blur(12px);
     z-index: 1000;
-    display: flex;
-    flex-direction: column;
+    display: flex; flex-direction: column;
     border-left: 1px solid rgba(212, 168, 67, 0.2);
     box-shadow: -4px 0 30px rgba(0,0,0,0.5);
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
-
   #panel.collapsed { transform: translateX(100%); }
 
   #panel-toggle {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    z-index: 1001;
-    background: var(--panel-bg);
-    border: 1px solid var(--gold);
-    color: var(--gold);
-    width: 44px;
-    height: 44px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: fixed; top: 16px; right: 16px; z-index: 1001;
+    background: var(--panel-bg); border: 1px solid var(--gold); color: var(--gold);
+    width: 44px; height: 44px; border-radius: 8px; cursor: pointer;
+    font-size: 20px; display: flex; align-items: center; justify-content: center;
     transition: all 0.2s;
   }
   #panel-toggle:hover { background: var(--gold); color: var(--earth); }
   #panel.collapsed ~ #panel-toggle { right: 16px; }
   #panel:not(.collapsed) ~ #panel-toggle { right: 396px; }
 
+  /* Panel header */
   .panel-header {
-    padding: 20px 20px 12px;
+    padding: 16px 20px 12px;
     border-bottom: 1px solid rgba(212, 168, 67, 0.15);
     flex-shrink: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
   }
 
-  .panel-header-left {}
+  .panel-title-row {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+  }
 
   .panel-header h1 {
     font-family: 'DM Serif Display', serif;
-    font-size: 22px;
-    color: var(--gold);
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
+    font-size: 28px; color: var(--gold); letter-spacing: 0.5px;
+    margin-bottom: 8px;
   }
 
-  .panel-header .subtitle {
-    font-size: 11px;
-    color: var(--bone);
-    opacity: 0.6;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
+  /* Field selector bar */
+  .field-bar {
+    display: flex; gap: 6px; align-items: center;
   }
 
-  .io-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    flex-shrink: 0;
-    margin-top: 2px;
-    margin-right: 48px;
+  .field-bar select {
+    flex: 1;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(212, 168, 67, 0.3);
+    color: var(--cream);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; outline: none;
   }
+  .field-bar select:focus { border-color: var(--gold); }
+  .field-bar select option { background: #2c1e0f; color: var(--cream); }
 
-  .io-buttons button {
+  .field-bar button {
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(212, 168, 67, 0.25);
     color: var(--gold);
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 10px;
-    font-weight: 600;
+    padding: 6px 8px; border-radius: 6px; cursor: pointer;
+    font-size: 14px; font-weight: 600;
     font-family: 'DM Sans', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
+    transition: all 0.2s; white-space: nowrap;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .field-bar button:hover {
+    background: rgba(212, 168, 67, 0.15);
+    border-color: var(--gold);
+  }
+  .field-bar button.delete-field:hover {
+    border-color: var(--rust); color: var(--rust);
+  }
+
+  /* Field name row */
+  .field-name-row {
+    display: flex; gap: 8px; align-items: center; margin-top: 8px;
+  }
+
+  .field-name-row label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--gold); opacity: 0.7; flex-shrink: 0;
+  }
+
+  .field-name-row input {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(212, 168, 67, 0.2);
+    color: var(--cream); padding: 5px 10px; border-radius: 6px;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+    outline: none;
+  }
+  .field-name-row input:focus { border-color: var(--gold); }
+
+  /* IO buttons row */
+  .io-row {
+    display: flex; gap: 6px; margin-top: 8px;
+  }
+
+  .io-row button {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(212, 168, 67, 0.2);
+    color: var(--gold); padding: 4px 10px; border-radius: 5px;
+    cursor: pointer; font-size: 10px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    text-transform: uppercase; letter-spacing: 0.8px;
     transition: all 0.2s;
   }
-  .io-buttons button:hover {
+  .io-row button:hover {
     background: rgba(212, 168, 67, 0.15);
     border-color: var(--gold);
   }
@@ -176,47 +194,28 @@
   }
 
   .nw-controls label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    color: var(--gold);
-    opacity: 0.8;
-    display: block;
-    margin-bottom: 6px;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px;
+    color: var(--gold); opacity: 0.8; display: block; margin-bottom: 6px;
   }
 
   .nw-inputs {
-    display: flex;
-    gap: 8px;
-    align-items: center;
+    display: flex; gap: 8px; align-items: center;
   }
 
   .nw-inputs input {
     flex: 1;
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(212, 168, 67, 0.2);
-    color: var(--cream);
-    padding: 7px 10px;
-    border-radius: 6px;
-    font-family: 'DM Sans', monospace;
-    font-size: 12px;
-    outline: none;
-    transition: border-color 0.2s;
+    color: var(--cream); padding: 7px 10px; border-radius: 6px;
+    font-family: 'DM Sans', monospace; font-size: 12px;
+    outline: none; transition: border-color 0.2s;
   }
-  .nw-inputs input:focus {
-    border-color: var(--gold);
-  }
+  .nw-inputs input:focus { border-color: var(--gold); }
 
   .nw-inputs button {
-    background: var(--sage);
-    border: none;
-    color: white;
-    padding: 7px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 11px;
-    font-weight: 600;
-    white-space: nowrap;
+    background: var(--sage); border: none; color: white;
+    padding: 7px 12px; border-radius: 6px; cursor: pointer;
+    font-size: 11px; font-weight: 600; white-space: nowrap;
     transition: background 0.2s;
   }
   .nw-inputs button:hover { background: var(--leaf); }
@@ -225,44 +224,27 @@
   .defaults-bar {
     padding: 12px 20px;
     border-bottom: 1px solid rgba(212, 168, 67, 0.15);
-    display: flex;
-    gap: 10px;
-    flex-shrink: 0;
+    display: flex; gap: 10px; flex-shrink: 0;
   }
 
-  .default-group {
-    flex: 1;
-  }
+  .default-group { flex: 1; }
 
   .default-group label {
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--bone);
-    opacity: 0.5;
-    display: block;
-    margin-bottom: 3px;
+    font-size: 9px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--bone); opacity: 0.5; display: block; margin-bottom: 3px;
   }
 
   .default-group input {
     width: 100%;
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(212, 168, 67, 0.15);
-    color: var(--cream);
-    padding: 5px 8px;
-    border-radius: 5px;
-    font-size: 12px;
-    outline: none;
+    color: var(--cream); padding: 5px 8px; border-radius: 5px;
+    font-size: 12px; outline: none;
   }
   .default-group input:focus { border-color: var(--gold); }
 
   /* Row list */
-  .row-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px 0;
-  }
-
+  .row-list { flex: 1; overflow-y: auto; padding: 8px 0; }
   .row-list::-webkit-scrollbar { width: 6px; }
   .row-list::-webkit-scrollbar-track { background: transparent; }
   .row-list::-webkit-scrollbar-thumb { background: rgba(212, 168, 67, 0.25); border-radius: 3px; }
@@ -270,169 +252,122 @@
   .row-item {
     padding: 10px 20px;
     border-bottom: 1px solid rgba(255,255,255,0.04);
-    transition: background 0.15s;
-    cursor: default;
+    transition: background 0.15s; cursor: default;
   }
   .row-item:hover { background: rgba(255,255,255,0.03); }
 
   .row-item-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
   }
 
   .row-type-badge {
-    font-size: 9px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 2px 7px;
-    border-radius: 3px;
-    flex-shrink: 0;
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; padding: 2px 7px; border-radius: 3px; flex-shrink: 0;
   }
+  .row-type-badge.lane { background: rgba(180, 160, 130, 0.25); color: #c8b896; }
+  .row-type-badge.crop { background: rgba(74, 124, 63, 0.3); color: #8bc47a; }
 
-  .row-type-badge.lane {
-    background: rgba(180, 160, 130, 0.25);
-    color: #c8b896;
-  }
-
-  .row-type-badge.crop {
-    background: rgba(74, 124, 63, 0.3);
-    color: #8bc47a;
-  }
-
-  .row-name {
-    font-weight: 600;
-    font-size: 13px;
-    flex: 1;
-    min-width: 0;
-  }
-
+  .row-name { font-weight: 600; font-size: 13px; flex: 1; min-width: 0; }
   .row-name.lane-name { color: #c8b896; }
   .row-name.crop-name { color: #8bc47a; }
 
   .row-controls {
-    display: flex;
-    gap: 6px;
-    align-items: center;
+    display: flex; gap: 6px; align-items: center;
   }
 
   .row-controls select,
   .row-controls input {
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.1);
-    color: var(--cream);
-    padding: 4px 6px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-family: 'DM Sans', sans-serif;
-    outline: none;
+    color: var(--cream); padding: 4px 6px; border-radius: 4px;
+    font-size: 11px; font-family: 'DM Sans', sans-serif; outline: none;
   }
   .row-controls select { cursor: pointer; }
-  .row-controls select:focus,
-  .row-controls input:focus { border-color: var(--gold); }
-
+  .row-controls select:focus, .row-controls input:focus { border-color: var(--gold); }
   .row-controls input { width: 52px; text-align: center; }
   .row-controls select { width: 70px; }
 
   .row-dims {
-    font-size: 10px;
-    color: var(--bone);
-    opacity: 0.45;
-    margin-left: auto;
-    white-space: nowrap;
+    font-size: 10px; color: var(--bone); opacity: 0.45;
+    margin-left: auto; white-space: nowrap;
   }
 
-  .row-actions {
-    display: flex;
-    gap: 4px;
-  }
+  .row-actions { display: flex; gap: 4px; }
 
   .row-actions button {
     background: none;
     border: 1px solid rgba(255,255,255,0.08);
-    color: var(--bone);
-    opacity: 0.4;
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    color: var(--bone); opacity: 0.4;
+    width: 24px; height: 24px; border-radius: 4px;
+    cursor: pointer; font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
     transition: all 0.15s;
   }
   .row-actions button:hover { opacity: 1; border-color: var(--gold); color: var(--gold); }
   .row-actions button.delete:hover { border-color: var(--rust); color: var(--rust); }
 
-  /* Add row button */
   .add-row-bar {
     padding: 12px 20px;
     border-top: 1px solid rgba(212, 168, 67, 0.15);
-    flex-shrink: 0;
-    display: flex;
-    gap: 8px;
+    flex-shrink: 0; display: flex; gap: 8px;
   }
 
   .add-row-bar button {
-    flex: 1;
-    padding: 9px;
-    border-radius: 6px;
+    flex: 1; padding: 9px; border-radius: 6px;
     border: 1px dashed rgba(212, 168, 67, 0.3);
     background: rgba(212, 168, 67, 0.05);
-    color: var(--gold);
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 600;
-    font-family: 'DM Sans', sans-serif;
-    transition: all 0.2s;
+    color: var(--gold); cursor: pointer;
+    font-size: 12px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
   }
   .add-row-bar button:hover {
-    background: rgba(212, 168, 67, 0.12);
-    border-color: var(--gold);
+    background: rgba(212, 168, 67, 0.12); border-color: var(--gold);
   }
 
-  /* Stats bar */
   .stats-bar {
     padding: 10px 20px;
     border-top: 1px solid rgba(212, 168, 67, 0.15);
-    font-size: 11px;
-    color: var(--bone);
-    opacity: 0.6;
-    flex-shrink: 0;
-    display: flex;
-    justify-content: space-between;
+    font-size: 11px; color: var(--bone); opacity: 0.6;
+    flex-shrink: 0; display: flex; justify-content: space-between;
   }
 
-  /* NW marker */
   .nw-marker-icon {
     background: var(--gold);
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
+    width: 14px; height: 14px; border-radius: 50%;
     border: 3px solid var(--earth);
     box-shadow: 0 0 0 2px var(--gold), 0 2px 8px rgba(0,0,0,0.5);
   }
 
-  /* Hidden file input */
+  .inactive-marker-icon {
+    background: rgba(180,160,130,0.6);
+    width: 10px; height: 10px; border-radius: 50%;
+    border: 2px solid rgba(44,30,15,0.7);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  }
+
   #import-input { display: none; }
 
-  /* Dimension overlay on map */
   .dim-tooltip {
     background: rgba(0,0,0,0.7) !important;
-    border: none !important;
-    color: #fff !important;
+    border: none !important; color: #fff !important;
     font-family: 'DM Sans', sans-serif !important;
-    font-size: 9px !important;
-    font-weight: 600 !important;
-    padding: 2px 5px !important;
-    border-radius: 3px !important;
-    white-space: nowrap !important;
-    box-shadow: none !important;
+    font-size: 9px !important; font-weight: 600 !important;
+    padding: 2px 5px !important; border-radius: 3px !important;
+    white-space: nowrap !important; box-shadow: none !important;
   }
   .dim-tooltip::before { display: none !important; }
+
+  /* Inactive field name tooltip */
+  .inactive-field-tooltip {
+    background: rgba(44, 30, 15, 0.85) !important;
+    border: 1px solid rgba(180,160,130,0.4) !important;
+    color: #c8b896 !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 11px !important; font-weight: 600 !important;
+    padding: 4px 10px !important; border-radius: 5px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+  }
+  .inactive-field-tooltip::before { display: none !important; }
 </style>
 </head>
 <body>
@@ -444,13 +379,25 @@
 
 <div id="panel">
   <div class="panel-header">
-    <div class="panel-header-left">
+    <div class="panel-title-row">
       <h1>Twisted River Farm</h1>
-      <div class="subtitle">Row Planner — Mitchell, IA</div>
     </div>
-    <div class="io-buttons">
-      <button onclick="exportJSON()" title="Export layout as JSON">Export</button>
-      <button onclick="document.getElementById('import-input').click()" title="Import layout from JSON">Import</button>
+
+    <div class="field-bar">
+      <select id="field-select" onchange="switchField(this.value)"></select>
+      <button onclick="addField()" title="New Field">+</button>
+      <button class="delete-field" onclick="deleteActiveField()" title="Delete Field">✕</button>
+    </div>
+
+    <div class="field-name-row">
+      <label>Name</label>
+      <input type="text" id="field-name" onchange="renameActiveField(this.value)" />
+    </div>
+
+    <div class="io-row">
+      <button onclick="exportFieldJSON()" title="Export this field as JSON">Export Field</button>
+      <button onclick="document.getElementById('import-input').click()" title="Import a field from JSON">Import Field</button>
+      <button id="orientation-toggle" onclick="toggleOrientation()" title="Toggle row direction">⬍ Vertical</button>
     </div>
   </div>
 
@@ -466,15 +413,15 @@
   <div class="defaults-bar">
     <div class="default-group">
       <label>Lane Width (ft)</label>
-      <input type="number" id="default-lane-width" value="6" min="0.5" step="0.5" onchange="saveState()" />
+      <input type="number" id="default-lane-width" value="6" min="0.5" step="0.5" onchange="snapshotForUndo();saveState()" />
     </div>
     <div class="default-group">
       <label>Crop Width (ft)</label>
-      <input type="number" id="default-crop-width" value="24" min="0.5" step="0.5" onchange="saveState()" />
+      <input type="number" id="default-crop-width" value="24" min="0.5" step="0.5" onchange="snapshotForUndo();saveState()" />
     </div>
     <div class="default-group">
       <label>Row Length (ft)</label>
-      <input type="number" id="default-length" value="250" min="1" step="1" onchange="saveState()" />
+      <input type="number" id="default-length" value="250" min="1" step="1" onchange="snapshotForUndo();saveState()" />
     </div>
   </div>
 
@@ -494,64 +441,46 @@
 <script>
 // --- Constants ---
 const FT_TO_M = 0.3048;
-const M_PER_DEG_LAT = 111132.92; // at ~43° lat
+const M_PER_DEG_LAT = 111132.92;
 const DEFAULT_NW = { lat: 43.32251614380451, lng: -92.86184191703798 };
-
 const DEFAULT_LANE_WIDTH = 6;
 const DEFAULT_CROP_WIDTH = 24;
 const DEFAULT_LENGTH = 250;
+const STORAGE_KEY = 'twistedriver-rows';
 
 const INITIAL_CROPS = [
   "Spring Brassica A","Spring Brassica B",
-  "Onions","Onions",
-  "Garlic",
+  "Onions","Onions","Garlic",
   "Corn","Corn","Corn","Corn","Corn","Corn",
-  "Beans","Beans",
-  "Potatoes",
-  "Yukon+Carrots","Sweet Pot+Beets",
-  "Tom/Peppers",
+  "Beans","Beans","Potatoes",
+  "Yukon+Carrots","Sweet Pot+Beets","Tom/Peppers",
   "Fall Brass","Fall Brass","Fall Brass",
   "Lettuce","Sunflowers","Cantaloupe","Canary","Winter Squash"
 ];
 
 // --- State ---
 let state = loadState();
+let undoStack = [];
 
 // --- Map Setup ---
-function getFieldCenter() {
-  const totalWidth = state.rows.reduce((s, r) => s + r.width, 0);
-  const maxLength = Math.max(...state.rows.map(r => r.length), 0);
-  return [
-    state.nw.lat - ftToLatDeg(maxLength / 2),
-    state.nw.lng + ftToLngDeg(totalWidth / 2, state.nw.lat)
-  ];
-}
-
 const map = L.map('map', {
-  center: getFieldCenter(),
+  center: getFieldCenter(activeField()),
   zoom: 19,
   maxZoom: 22
 });
 
-// Google Satellite tiles (highest res)
 L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-  maxZoom: 22,
-  maxNativeZoom: 21,
-  attribution: '&copy; Google'
+  maxZoom: 22, maxNativeZoom: 21, attribution: '&copy; Google'
 }).addTo(map);
 
-let rowLayers = [];      // rectangles
-let labelLayers = [];    // separate label markers for crop vertical text
-let dimPolylines = [];   // dimension lines
-let nwMarker = null;
+let activeLayers = [];     // rects for active field
+let activeLabelLayers = []; // label markers for active field
+let activeDimLayers = [];  // dim lines for active field
+let activeNwMarker = null;
+let inactiveLayers = [];   // outlines + markers for other fields
 
 // --- Init ---
-document.getElementById('nw-lat').value = state.nw.lat;
-document.getElementById('nw-lng').value = state.nw.lng;
-document.getElementById('default-lane-width').value = state.defaultLaneWidth;
-document.getElementById('default-crop-width').value = state.defaultCropWidth;
-document.getElementById('default-length').value = state.defaultLength;
-
+populateUI();
 renderAll();
 
 // --- Import handler ---
@@ -562,53 +491,79 @@ document.getElementById('import-input').addEventListener('change', function(e) {
   reader.onload = function(ev) {
     try {
       const imported = JSON.parse(ev.target.result);
+      // Accept either a single field object or old format
+      let fieldData;
       if (imported.rows && imported.nw) {
-        state = imported;
-        localStorage.setItem('twistedriver-rows', JSON.stringify(state));
-        document.getElementById('nw-lat').value = state.nw.lat;
-        document.getElementById('nw-lng').value = state.nw.lng;
-        document.getElementById('default-lane-width').value = state.defaultLaneWidth;
-        document.getElementById('default-crop-width').value = state.defaultCropWidth;
-        document.getElementById('default-length').value = state.defaultLength;
-        renderAll();
-        fitMapToRows();
-        map.setView([state.nw.lat, state.nw.lng], map.getZoom());
+        fieldData = migrateOldField(imported);
       } else {
         alert('Invalid JSON: missing rows or nw fields');
+        return;
       }
+      // Give it a new id and unique name
+      fieldData.id = genId();
+      fieldData.name = makeUniqueName(fieldData.name || 'Imported Field');
+      state.fields.push(fieldData);
+      state.activeFieldId = fieldData.id;
+      persist();
+      populateUI();
+      renderAll();
+      zoomToField(fieldData);
     } catch(err) {
       alert('Failed to parse JSON: ' + err.message);
     }
   };
   reader.readAsText(file);
-  e.target.value = ''; // reset so same file can re-import
+  e.target.value = '';
 });
 
-// --- Functions ---
+// --- Load / Migration ---
 function loadState() {
-  const saved = localStorage.getItem('twistedriver-rows');
+  const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
-    try { return JSON.parse(saved); } catch(e) {}
+    try {
+      const parsed = JSON.parse(saved);
+      // Already multi-field format
+      if (parsed.fields && Array.isArray(parsed.fields)) {
+        return parsed;
+      }
+      // Old single-field format → migrate
+      if (parsed.rows && parsed.nw) {
+        const field = migrateOldField(parsed);
+        return { activeFieldId: field.id, fields: [field] };
+      }
+    } catch(e) {}
   }
   return buildInitialState();
 }
 
+function migrateOldField(old) {
+  return {
+    id: old.id || genId(),
+    name: old.name || 'Field 1',
+    nw: old.nw,
+    defaultLaneWidth: old.defaultLaneWidth || DEFAULT_LANE_WIDTH,
+    defaultCropWidth: old.defaultCropWidth || DEFAULT_CROP_WIDTH,
+    defaultLength: old.defaultLength || DEFAULT_LENGTH,
+    rows: old.rows
+  };
+}
+
 function buildInitialState() {
+  const field = buildDefaultField('Field 1');
+  return { activeFieldId: field.id, fields: [field] };
+}
+
+function buildDefaultField(name) {
   const rows = [];
   const counts = {};
   const totals = {};
   INITIAL_CROPS.forEach(c => { totals[c] = (totals[c] || 0) + 1; });
 
   INITIAL_CROPS.forEach((cropName, i) => {
-    // Lane before each crop
     rows.push({
-      id: genId(),
-      type: 'lane',
-      name: `Lane ${i + 1}`,
-      width: DEFAULT_LANE_WIDTH,
-      length: DEFAULT_LENGTH,
-      widthOverride: false,
-      lengthOverride: false
+      id: genId(), type: 'lane', name: `Lane ${i + 1}`,
+      width: DEFAULT_LANE_WIDTH, length: DEFAULT_LENGTH,
+      widthOverride: false, lengthOverride: false
     });
 
     let label = cropName;
@@ -618,28 +573,21 @@ function buildInitialState() {
     }
 
     rows.push({
-      id: genId(),
-      type: 'crop',
-      name: label,
-      width: DEFAULT_CROP_WIDTH,
-      length: DEFAULT_LENGTH,
-      widthOverride: false,
-      lengthOverride: false
+      id: genId(), type: 'crop', name: label,
+      width: DEFAULT_CROP_WIDTH, length: DEFAULT_LENGTH,
+      widthOverride: false, lengthOverride: false
     });
   });
 
-  // Final lane
   rows.push({
-    id: genId(),
-    type: 'lane',
-    name: `Lane ${INITIAL_CROPS.length + 1}`,
-    width: DEFAULT_LANE_WIDTH,
-    length: DEFAULT_LENGTH,
-    widthOverride: false,
-    lengthOverride: false
+    id: genId(), type: 'lane', name: `Lane ${INITIAL_CROPS.length + 1}`,
+    width: DEFAULT_LANE_WIDTH, length: DEFAULT_LENGTH,
+    widthOverride: false, lengthOverride: false
   });
 
   return {
+    id: genId(),
+    name: name,
     nw: { ...DEFAULT_NW },
     defaultLaneWidth: DEFAULT_LANE_WIDTH,
     defaultCropWidth: DEFAULT_CROP_WIDTH,
@@ -648,25 +596,200 @@ function buildInitialState() {
   };
 }
 
+// --- Helpers ---
 function genId() {
-  return 'r' + Math.random().toString(36).substring(2, 10);
+  return 'f' + Math.random().toString(36).substring(2, 10);
 }
 
-function saveState() {
-  state.defaultLaneWidth = parseFloat(document.getElementById('default-lane-width').value) || DEFAULT_LANE_WIDTH;
-  state.defaultCropWidth = parseFloat(document.getElementById('default-crop-width').value) || DEFAULT_CROP_WIDTH;
-  state.defaultLength = parseFloat(document.getElementById('default-length').value) || DEFAULT_LENGTH;
+function activeField() {
+  return state.fields.find(f => f.id === state.activeFieldId) || state.fields[0];
+}
 
-  state.rows.forEach(r => {
+function makeUniqueName(baseName) {
+  const names = state.fields.map(f => f.name);
+  if (!names.includes(baseName)) return baseName;
+  let i = 2;
+  while (names.includes(`${baseName} ${i}`)) i++;
+  return `${baseName} ${i}`;
+}
+
+function persist() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function snapshotForUndo() {
+  undoStack.push(JSON.stringify(state));
+  if (undoStack.length > 50) undoStack.shift(); // cap memory
+}
+
+function undo() {
+  if (undoStack.length === 0) return;
+  state = JSON.parse(undoStack.pop());
+  persist();
+  populateUI();
+  renderAll();
+}
+
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+    e.preventDefault();
+    undo();
+  }
+});
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// --- Geo helpers ---
+function mPerDegLng(lat) {
+  return 111320 * Math.cos(lat * Math.PI / 180);
+}
+function ftToLatDeg(ft) {
+  return (ft * FT_TO_M) / M_PER_DEG_LAT;
+}
+function ftToLngDeg(ft, lat) {
+  return (ft * FT_TO_M) / mPerDegLng(lat);
+}
+function isVertical(field) {
+  return (field.orientation || 'vertical') === 'vertical';
+}
+function getFieldCenter(field) {
+  if (!field || !field.rows || field.rows.length === 0) return [field.nw.lat, field.nw.lng];
+  const totalWidth = field.rows.reduce((s, r) => s + r.width, 0);
+  const maxLength = Math.max(...field.rows.map(r => r.length));
+  if (isVertical(field)) {
+    return [
+      field.nw.lat - ftToLatDeg(maxLength / 2),
+      field.nw.lng + ftToLngDeg(totalWidth / 2, field.nw.lat)
+    ];
+  } else {
+    return [
+      field.nw.lat - ftToLatDeg(totalWidth / 2),
+      field.nw.lng + ftToLngDeg(maxLength / 2, field.nw.lat)
+    ];
+  }
+}
+function getFieldBounds(field) {
+  if (!field.rows || field.rows.length === 0) return null;
+  const totalWidth = field.rows.reduce((s, r) => s + r.width, 0);
+  const maxLength = Math.max(...field.rows.map(r => r.length));
+  if (isVertical(field)) {
+    return [
+      [field.nw.lat, field.nw.lng],
+      [field.nw.lat - ftToLatDeg(maxLength), field.nw.lng + ftToLngDeg(totalWidth, field.nw.lat)]
+    ];
+  } else {
+    return [
+      [field.nw.lat, field.nw.lng],
+      [field.nw.lat - ftToLatDeg(totalWidth), field.nw.lng + ftToLngDeg(maxLength, field.nw.lat)]
+    ];
+  }
+}
+
+// --- Field management ---
+function switchField(id) {
+  state.activeFieldId = id;
+  persist();
+  populateUI();
+  renderAll();
+  zoomToField(activeField());
+}
+
+function addField() {
+  const name = makeUniqueName('Field ' + (state.fields.length + 1));
+  const field = {
+    id: genId(),
+    name: name,
+    nw: {
+      lat: map.getCenter().lat,
+      lng: map.getCenter().lng
+    },
+    defaultLaneWidth: DEFAULT_LANE_WIDTH,
+    defaultCropWidth: DEFAULT_CROP_WIDTH,
+    defaultLength: DEFAULT_LENGTH,
+    rows: []
+  };
+  state.fields.push(field);
+  state.activeFieldId = field.id;
+  persist();
+  populateUI();
+  renderAll();
+}
+
+function deleteActiveField() {
+  if (state.fields.length <= 1) {
+    alert('Cannot delete the last field.');
+    return;
+  }
+  const field = activeField();
+  if (!confirm(`Delete field "${field.name}" and all its rows?`)) return;
+  state.fields = state.fields.filter(f => f.id !== field.id);
+  state.activeFieldId = state.fields[0].id;
+  persist();
+  populateUI();
+  renderAll();
+  zoomToField(activeField());
+}
+
+function renameActiveField(newName) {
+  activeField().name = newName;
+  persist();
+  // Update dropdown text without full re-render
+  const opt = document.querySelector(`#field-select option[value="${state.activeFieldId}"]`);
+  if (opt) opt.textContent = newName;
+  renderMap(); // update inactive field tooltips
+}
+
+function zoomToField(field) {
+  const center = getFieldCenter(field);
+  map.setView(center, map.getZoom());
+}
+
+// --- UI Population ---
+function populateUI() {
+  const field = activeField();
+
+  // Field dropdown
+  const sel = document.getElementById('field-select');
+  sel.innerHTML = state.fields.map(f =>
+    `<option value="${f.id}" ${f.id === state.activeFieldId ? 'selected' : ''}>${escHtml(f.name)}</option>`
+  ).join('');
+
+  // Field name
+  document.getElementById('field-name').value = field.name;
+
+  // NW
+  document.getElementById('nw-lat').value = field.nw.lat;
+  document.getElementById('nw-lng').value = field.nw.lng;
+
+  // Defaults
+  document.getElementById('default-lane-width').value = field.defaultLaneWidth;
+  document.getElementById('default-crop-width').value = field.defaultCropWidth;
+  document.getElementById('default-length').value = field.defaultLength;
+
+  // Orientation toggle
+  const isVert = (field.orientation || 'vertical') === 'vertical';
+  document.getElementById('orientation-toggle').textContent = isVert ? '⬍ Vertical' : '⬌ Horizontal';
+}
+
+// --- State mutations (all operate on active field) ---
+function saveState() {
+  const field = activeField();
+  field.defaultLaneWidth = parseFloat(document.getElementById('default-lane-width').value) || DEFAULT_LANE_WIDTH;
+  field.defaultCropWidth = parseFloat(document.getElementById('default-crop-width').value) || DEFAULT_CROP_WIDTH;
+  field.defaultLength = parseFloat(document.getElementById('default-length').value) || DEFAULT_LENGTH;
+
+  field.rows.forEach(r => {
     if (!r.widthOverride) {
-      r.width = r.type === 'lane' ? state.defaultLaneWidth : state.defaultCropWidth;
+      r.width = r.type === 'lane' ? field.defaultLaneWidth : field.defaultCropWidth;
     }
     if (!r.lengthOverride) {
-      r.length = state.defaultLength;
+      r.length = field.defaultLength;
     }
   });
 
-  localStorage.setItem('twistedriver-rows', JSON.stringify(state));
+  persist();
   renderAll();
 }
 
@@ -674,43 +797,49 @@ function updateAnchor() {
   const lat = parseFloat(document.getElementById('nw-lat').value);
   const lng = parseFloat(document.getElementById('nw-lng').value);
   if (!isNaN(lat) && !isNaN(lng)) {
-    state.nw = { lat, lng };
+    snapshotForUndo();
+    activeField().nw = { lat, lng };
     saveState();
-    map.setView([lat, lng], map.getZoom());
+    map.setView(getFieldCenter(activeField()), map.getZoom());
   }
 }
 
 function addRow(type) {
+  snapshotForUndo();
+  const field = activeField();
   const name = type === 'lane'
-    ? `Lane ${state.rows.filter(r => r.type === 'lane').length + 1}`
+    ? `Lane ${field.rows.filter(r => r.type === 'lane').length + 1}`
     : `New Crop`;
-  state.rows.push({
-    id: genId(),
-    type,
-    name,
-    width: type === 'lane' ? state.defaultLaneWidth : state.defaultCropWidth,
-    length: state.defaultLength,
-    widthOverride: false,
-    lengthOverride: false
+  field.rows.push({
+    id: genId(), type, name,
+    width: type === 'lane' ? field.defaultLaneWidth : field.defaultCropWidth,
+    length: field.defaultLength,
+    widthOverride: false, lengthOverride: false
   });
   saveState();
 }
 
 function deleteRow(id) {
-  state.rows = state.rows.filter(r => r.id !== id);
+  snapshotForUndo();
+  const field = activeField();
+  field.rows = field.rows.filter(r => r.id !== id);
   saveState();
 }
 
 function moveRow(id, dir) {
-  const idx = state.rows.findIndex(r => r.id === id);
+  snapshotForUndo();
+  const field = activeField();
+  const idx = field.rows.findIndex(r => r.id === id);
   const newIdx = idx + dir;
-  if (newIdx < 0 || newIdx >= state.rows.length) return;
-  [state.rows[idx], state.rows[newIdx]] = [state.rows[newIdx], state.rows[idx]];
+  if (newIdx < 0 || newIdx >= field.rows.length) return;
+  [field.rows[idx], field.rows[newIdx]] = [field.rows[newIdx], field.rows[idx]];
   saveState();
 }
 
 function updateRowField(id, field, value) {
-  const row = state.rows.find(r => r.id === id);
+  snapshotForUndo();
+  const af = activeField();
+  const row = af.rows.find(r => r.id === id);
   if (!row) return;
 
   if (field === 'name') {
@@ -718,46 +847,38 @@ function updateRowField(id, field, value) {
   } else if (field === 'type') {
     row.type = value;
     if (!row.widthOverride) {
-      row.width = value === 'lane' ? state.defaultLaneWidth : state.defaultCropWidth;
+      row.width = value === 'lane' ? af.defaultLaneWidth : af.defaultCropWidth;
     }
   } else if (field === 'width') {
     const v = parseFloat(value);
-    if (!isNaN(v) && v > 0) {
-      row.width = v;
-      row.widthOverride = true;
-    }
+    if (!isNaN(v) && v > 0) { row.width = v; row.widthOverride = true; }
   } else if (field === 'length') {
     const v = parseFloat(value);
-    if (!isNaN(v) && v > 0) {
-      row.length = v;
-      row.lengthOverride = true;
-    }
+    if (!isNaN(v) && v > 0) { row.length = v; row.lengthOverride = true; }
   }
   saveState();
 }
 
+function toggleOrientation() {
+  snapshotForUndo();
+  const field = activeField();
+  field.orientation = (field.orientation || 'vertical') === 'vertical' ? 'horizontal' : 'vertical';
+  persist();
+  populateUI();
+  renderAll();
+}
+
 // --- Export / Import ---
-function exportJSON() {
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+function exportFieldJSON() {
+  const field = activeField();
+  const blob = new Blob([JSON.stringify(field, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'twisted-river-farm-layout.json';
+  const safeName = field.name.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+  a.download = `twisted-river-${safeName}.json`;
   a.click();
   URL.revokeObjectURL(url);
-}
-
-// --- Geo helpers ---
-function mPerDegLng(lat) {
-  return 111320 * Math.cos(lat * Math.PI / 180);
-}
-
-function ftToLatDeg(ft) {
-  return (ft * FT_TO_M) / M_PER_DEG_LAT;
-}
-
-function ftToLngDeg(ft, lat) {
-  return (ft * FT_TO_M) / mPerDegLng(lat);
 }
 
 // --- Render ---
@@ -768,17 +889,19 @@ function renderAll() {
 }
 
 function updateStats() {
-  const totalWidth = state.rows.reduce((s, r) => s + r.width, 0);
-  const cropArea = state.rows.filter(r => r.type === 'crop').reduce((s, r) => s + r.width * r.length, 0);
+  const field = activeField();
+  const totalWidth = field.rows.reduce((s, r) => s + r.width, 0);
+  const cropArea = field.rows.filter(r => r.type === 'crop').reduce((s, r) => s + r.width * r.length, 0);
   document.getElementById('stats-count').textContent =
-    `${state.rows.length} rows (${state.rows.filter(r=>r.type==='crop').length} crop)`;
+    `${field.rows.length} rows (${field.rows.filter(r=>r.type==='crop').length} crop)`;
   document.getElementById('stats-width').textContent =
     `Width: ${totalWidth.toFixed(1)} ft · Crop area: ${(cropArea / 43560).toFixed(2)} ac`;
 }
 
 function renderList() {
+  const field = activeField();
   const container = document.getElementById('row-list');
-  container.innerHTML = state.rows.map((row, idx) => `
+  container.innerHTML = field.rows.map((row, idx) => `
     <div class="row-item" data-id="${row.id}">
       <div class="row-item-header">
         <span class="row-type-badge ${row.type}">${row.type}</span>
@@ -817,50 +940,135 @@ function renderList() {
   `).join('');
 }
 
-function escHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function renderMap() {
+  // Clear all layers
+  activeLayers.forEach(r => map.removeLayer(r));
+  activeLabelLayers.forEach(r => map.removeLayer(r));
+  activeDimLayers.forEach(r => map.removeLayer(r));
+  inactiveLayers.forEach(r => map.removeLayer(r));
+  activeLayers = [];
+  activeLabelLayers = [];
+  activeDimLayers = [];
+  inactiveLayers = [];
+  if (activeNwMarker) { map.removeLayer(activeNwMarker); activeNwMarker = null; }
+
+  // Draw INACTIVE fields first (outlines, dimmed, clickable)
+  state.fields.forEach(field => {
+    if (field.id === state.activeFieldId) return;
+    renderInactiveField(field);
+  });
+
+  // Draw ACTIVE field
+  const field = activeField();
+  renderActiveField(field);
 }
 
-function renderMap() {
-  // Clear old layers
-  rowLayers.forEach(r => map.removeLayer(r));
-  labelLayers.forEach(r => map.removeLayer(r));
-  dimPolylines.forEach(r => map.removeLayer(r));
-  rowLayers = [];
-  labelLayers = [];
-  dimPolylines = [];
-  if (nwMarker) { map.removeLayer(nwMarker); }
+function renderInactiveField(field) {
+  if (!field.rows || field.rows.length === 0) {
+    // Just draw a small marker at NW
+    const m = L.marker([field.nw.lat, field.nw.lng], {
+      icon: L.divIcon({
+        className: 'inactive-marker-icon',
+        iconSize: [10, 10], iconAnchor: [5, 5]
+      })
+    }).addTo(map);
+    m.bindTooltip(field.name, {
+      permanent: false, direction: 'top', className: 'inactive-field-tooltip'
+    });
+    m.on('click', function() { switchField(field.id); });
+    inactiveLayers.push(m);
+    return;
+  }
 
-  // NW draggable marker
-  nwMarker = L.marker([state.nw.lat, state.nw.lng], {
-    icon: L.divIcon({
-      className: 'nw-marker-icon',
-      iconSize: [14, 14],
-      iconAnchor: [7, 7]
-    }),
-    draggable: true,
-    zIndexOffset: 1000
+  const bounds = getFieldBounds(field);
+  if (!bounds) return;
+
+  // Draw a single outline rectangle for the whole field
+  const rect = L.rectangle(bounds, {
+    color: 'rgba(200, 180, 140, 0.5)',
+    weight: 2,
+    dashArray: '8,5',
+    fillColor: 'rgba(180, 160, 130, 0.6)',
+    fillOpacity: 1,
+    opacity: 0.8
   }).addTo(map);
 
-  nwMarker.on('dragend', function(e) {
+  rect.on('click', function() { switchField(field.id); });
+  inactiveLayers.push(rect);
+
+  // Permanent field name label at center
+  const center = getFieldCenter(field);
+  const nameLabel = L.marker(center, {
+    icon: L.divIcon({
+      className: '',
+      html: `<div style="
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px; font-weight: 700;
+        color: rgba(200, 184, 150, 0.8);
+        text-shadow: 0 0 6px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.6);
+        white-space: nowrap;
+        cursor: pointer;
+        text-align: center;
+      ">${escHtml(field.name)}</div>`,
+      iconSize: [0, 0], iconAnchor: [0, 0]
+    }),
+    interactive: true
+  }).addTo(map);
+  nameLabel.on('click', function() { switchField(field.id); });
+  inactiveLayers.push(nameLabel);
+
+  // Small marker at NW corner
+  const m = L.marker([field.nw.lat, field.nw.lng], {
+    icon: L.divIcon({
+      className: 'inactive-marker-icon',
+      iconSize: [10, 10], iconAnchor: [5, 5]
+    })
+  }).addTo(map);
+  m.on('click', function() { switchField(field.id); });
+  inactiveLayers.push(m);
+}
+
+function renderActiveField(field) {
+  // NW draggable marker
+  activeNwMarker = L.marker([field.nw.lat, field.nw.lng], {
+    icon: L.divIcon({
+      className: 'nw-marker-icon',
+      iconSize: [14, 14], iconAnchor: [7, 7]
+    }),
+    draggable: true, zIndexOffset: 1000
+  }).addTo(map);
+
+  activeNwMarker.on('dragend', function(e) {
+    snapshotForUndo();
     const pos = e.target.getLatLng();
-    state.nw = { lat: pos.lat, lng: pos.lng };
+    field.nw = { lat: pos.lat, lng: pos.lng };
     document.getElementById('nw-lat').value = pos.lat.toFixed(14);
     document.getElementById('nw-lng').value = pos.lng.toFixed(14);
     saveState();
   });
 
-  // Draw rows west→east
-  let offsetEastFt = 0;
+  // Draw rows
+  const vert = isVertical(field);
+  let offsetFt = 0;
 
-  state.rows.forEach((row, idx) => {
-    const westLng = state.nw.lng + ftToLngDeg(offsetEastFt, state.nw.lat);
-    const eastLng = state.nw.lng + ftToLngDeg(offsetEastFt + row.width, state.nw.lat);
-    const northLat = state.nw.lat;
-    const southLat = state.nw.lat - ftToLatDeg(row.length);
+  field.rows.forEach((row) => {
+    let northLat, southLat, westLng, eastLng;
+
+    if (vert) {
+      // Vertical: rows stack west→east, each row runs north→south
+      westLng = field.nw.lng + ftToLngDeg(offsetFt, field.nw.lat);
+      eastLng = field.nw.lng + ftToLngDeg(offsetFt + row.width, field.nw.lat);
+      northLat = field.nw.lat;
+      southLat = field.nw.lat - ftToLatDeg(row.length);
+    } else {
+      // Horizontal: rows stack north→south, each row runs west→east
+      northLat = field.nw.lat - ftToLatDeg(offsetFt);
+      southLat = field.nw.lat - ftToLatDeg(offsetFt + row.width);
+      westLng = field.nw.lng;
+      eastLng = field.nw.lng + ftToLngDeg(row.length, field.nw.lat);
+    }
 
     const bounds = [[northLat, westLng], [southLat, eastLng]];
-
     const isLane = row.type === 'lane';
     const color = isLane ? '#b0a080' : '#5eaa4e';
     const fillColor = isLane
@@ -868,114 +1076,95 @@ function renderMap() {
       : 'rgba(74, 160, 55, 0.35)';
 
     const rect = L.rectangle(bounds, {
-      color: color,
-      weight: 1,
-      fillColor: fillColor,
-      fillOpacity: 1,
-      opacity: 0.7
+      color, weight: 1, fillColor, fillOpacity: 1, opacity: 0.7
     }).addTo(map);
 
     if (isLane) {
-      // Lane: hover-only tooltip (horizontal)
       rect.bindTooltip(row.name, {
-        permanent: false,
-        direction: 'center',
-        className: 'lane-tooltip'
+        permanent: false, direction: 'center', className: 'lane-tooltip'
       });
     } else {
-      // Crop: permanent vertical label
-      // We'll use a divIcon marker at the center of the rect for rotated text
       const centerLat = (northLat + southLat) / 2;
       const centerLng = (westLng + eastLng) / 2;
-
+      // Vertical labels for vertical rows, horizontal for horizontal
+      const labelStyle = vert
+        ? 'writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg);'
+        : '';
       const labelMarker = L.marker([centerLat, centerLng], {
         icon: L.divIcon({
           className: '',
           html: `<div style="
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            transform: rotate(180deg);
+            ${labelStyle}
             font-family: 'DM Sans', sans-serif;
-            font-size: 11px;
-            font-weight: 700;
+            font-size: 11px; font-weight: 700;
             color: #b5e8a5;
             text-shadow: 0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7);
-            white-space: nowrap;
-            pointer-events: none;
+            white-space: nowrap; pointer-events: none;
             letter-spacing: 0.5px;
           ">${escHtml(row.name)}</div>`,
-          iconSize: [0, 0],
-          iconAnchor: [0, 0]
+          iconSize: [0, 0], iconAnchor: [0, 0]
         }),
         interactive: false
       }).addTo(map);
-
-      labelLayers.push(labelMarker);
+      activeLabelLayers.push(labelMarker);
     }
 
-    rowLayers.push(rect);
-    offsetEastFt += row.width;
+    activeLayers.push(rect);
+    offsetFt += row.width;
   });
 
-  // Draw overall dimension line along the top (width) and left (length)
-  renderDimensions(offsetEastFt);
+  renderDimensions(field, offsetFt);
 }
 
-function renderDimensions(totalWidthFt) {
-  if (state.rows.length === 0) return;
+function renderDimensions(field, totalWidthFt) {
+  if (field.rows.length === 0) return;
 
-  // Find max length
-  const maxLength = Math.max(...state.rows.map(r => r.length));
+  const maxLength = Math.max(...field.rows.map(r => r.length));
+  const vert = isVertical(field);
 
-  // Top width dimension line
-  const topLat = state.nw.lat + ftToLatDeg(3); // slightly above
-  const leftLng = state.nw.lng;
-  const rightLng = state.nw.lng + ftToLngDeg(totalWidthFt, state.nw.lat);
+  if (vert) {
+    // Width line across top (horizontal), length line down left (vertical)
+    const topLat = field.nw.lat + ftToLatDeg(3);
+    const rightLng = field.nw.lng + ftToLngDeg(totalWidthFt, field.nw.lat);
+    const widthLine = L.polyline([[topLat, field.nw.lng], [topLat, rightLng]], {
+      color: '#d4a843', weight: 2, dashArray: '6,4', opacity: 0.7
+    }).addTo(map);
+    widthLine.bindTooltip(`${totalWidthFt.toFixed(1)} ft`, {
+      permanent: true, direction: 'top', className: 'dim-tooltip', offset: [0, -4]
+    });
+    activeDimLayers.push(widthLine);
 
-  const widthLine = L.polyline([[topLat, leftLng], [topLat, rightLng]], {
-    color: '#d4a843',
-    weight: 2,
-    dashArray: '6,4',
-    opacity: 0.7
-  }).addTo(map);
+    const leftLng = field.nw.lng - ftToLngDeg(3, field.nw.lat);
+    const bottomLat = field.nw.lat - ftToLatDeg(maxLength);
+    const lengthLine = L.polyline([[field.nw.lat, leftLng], [bottomLat, leftLng]], {
+      color: '#d4a843', weight: 2, dashArray: '6,4', opacity: 0.7
+    }).addTo(map);
+    lengthLine.bindTooltip(`${maxLength.toFixed(0)} ft`, {
+      permanent: true, direction: 'left', className: 'dim-tooltip', offset: [-4, 0]
+    });
+    activeDimLayers.push(lengthLine);
+  } else {
+    // Width line down left (vertical, stacking direction), length line across top (horizontal)
+    const leftLng = field.nw.lng - ftToLngDeg(3, field.nw.lat);
+    const bottomLat = field.nw.lat - ftToLatDeg(totalWidthFt);
+    const widthLine = L.polyline([[field.nw.lat, leftLng], [bottomLat, leftLng]], {
+      color: '#d4a843', weight: 2, dashArray: '6,4', opacity: 0.7
+    }).addTo(map);
+    widthLine.bindTooltip(`${totalWidthFt.toFixed(1)} ft`, {
+      permanent: true, direction: 'left', className: 'dim-tooltip', offset: [-4, 0]
+    });
+    activeDimLayers.push(widthLine);
 
-  widthLine.bindTooltip(`${totalWidthFt.toFixed(1)} ft`, {
-    permanent: true,
-    direction: 'top',
-    className: 'dim-tooltip',
-    offset: [0, -4]
-  });
-  dimPolylines.push(widthLine);
-
-  // Left length dimension line
-  const leftLngOffset = state.nw.lng - ftToLngDeg(3, state.nw.lat);
-  const bottomLat = state.nw.lat - ftToLatDeg(maxLength);
-
-  const lengthLine = L.polyline([[state.nw.lat, leftLngOffset], [bottomLat, leftLngOffset]], {
-    color: '#d4a843',
-    weight: 2,
-    dashArray: '6,4',
-    opacity: 0.7
-  }).addTo(map);
-
-  lengthLine.bindTooltip(`${maxLength.toFixed(0)} ft`, {
-    permanent: true,
-    direction: 'left',
-    className: 'dim-tooltip',
-    offset: [-4, 0]
-  });
-  dimPolylines.push(lengthLine);
-}
-
-function fitMapToRows() {
-  if (state.rows.length === 0) return;
-  const totalWidth = state.rows.reduce((s, r) => s + r.width, 0);
-  const maxLength = Math.max(...state.rows.map(r => r.length));
-  const se = [
-    state.nw.lat - ftToLatDeg(maxLength),
-    state.nw.lng + ftToLngDeg(totalWidth, state.nw.lat)
-  ];
-  map.fitBounds([[state.nw.lat, state.nw.lng], se], { padding: [60, 400, 60, 60], maxZoom: 20 });
+    const topLat = field.nw.lat + ftToLatDeg(3);
+    const rightLng = field.nw.lng + ftToLngDeg(maxLength, field.nw.lat);
+    const lengthLine = L.polyline([[topLat, field.nw.lng], [topLat, rightLng]], {
+      color: '#d4a843', weight: 2, dashArray: '6,4', opacity: 0.7
+    }).addTo(map);
+    lengthLine.bindTooltip(`${maxLength.toFixed(0)} ft`, {
+      permanent: true, direction: 'top', className: 'dim-tooltip', offset: [0, -4]
+    });
+    activeDimLayers.push(lengthLine);
+  }
 }
 
 // Panel toggle

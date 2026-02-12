@@ -339,6 +339,89 @@
     box-shadow: 0 0 0 2px var(--gold), 0 2px 8px rgba(0,0,0,0.5);
   }
 
+  /* Ghost crosshair + dot that follows cursor during placement */
+  .nw-marker-ghost {
+    position: relative;
+    width: 60px; height: 60px;
+    pointer-events: none;
+  }
+  .nw-marker-ghost::before {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 14px; height: 14px;
+    transform: translate(-50%, -50%);
+    background: var(--gold);
+    border-radius: 50%;
+    border: 3px solid var(--earth);
+    box-shadow: 0 0 0 3px var(--gold), 0 0 20px 8px rgba(212,168,67,0.6);
+    animation: ghostDotPulse 1s ease-in-out infinite;
+  }
+  .nw-marker-ghost::after {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 50px; height: 50px;
+    transform: translate(-50%, -50%);
+    border: 2px solid rgba(212,168,67,0.8);
+    border-radius: 50%;
+    box-shadow: 0 0 12px 2px rgba(212,168,67,0.3);
+    animation: ghostRingPulse 1s ease-in-out infinite;
+  }
+  .nw-ghost-crosshair-h, .nw-ghost-crosshair-v {
+    position: absolute;
+    background: rgba(212,168,67,0.7);
+    pointer-events: none;
+  }
+  .nw-ghost-crosshair-h {
+    width: 60px; height: 2px;
+    left: 0; top: 50%;
+    transform: translateY(-50%);
+    box-shadow: 0 0 6px rgba(212,168,67,0.4);
+  }
+  .nw-ghost-crosshair-v {
+    width: 2px; height: 60px;
+    left: 50%; top: 0;
+    transform: translateX(-50%);
+    box-shadow: 0 0 6px rgba(212,168,67,0.4);
+  }
+  @keyframes ghostDotPulse {
+    0%, 100% { box-shadow: 0 0 0 3px var(--gold), 0 0 20px 8px rgba(212,168,67,0.6); }
+    50%      { box-shadow: 0 0 0 5px rgba(212,168,67,0.8), 0 0 30px 12px rgba(212,168,67,0.4); }
+  }
+  @keyframes ghostRingPulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+    50%      { transform: translate(-50%, -50%) scale(1.15); opacity: 0.5; }
+  }
+
+  /* Placement mode banner */
+  .placement-banner {
+    position: fixed;
+    top: 20px; left: 50%; transform: translateX(-50%);
+    z-index: 2000;
+    background: rgba(44, 30, 15, 0.95);
+    border: 2px solid var(--gold);
+    color: var(--gold);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 700;
+    padding: 12px 28px;
+    border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.6), 0 0 0 1px rgba(212,168,67,0.2);
+    letter-spacing: 0.5px;
+    animation: bannerFadeIn 0.3s ease-out;
+    pointer-events: none;
+  }
+  @keyframes bannerFadeIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
+  /* Hide default cursor during placement */
+  .leaflet-container.placing-anchor,
+  .leaflet-container.placing-anchor * {
+    cursor: none !important;
+  }
+
   .inactive-marker-icon {
     background: rgba(180,160,130,0.6);
     width: 10px; height: 10px; border-radius: 50%;
@@ -486,6 +569,7 @@ const INITIAL_CROPS = [
 // --- State ---
 let state = loadState();
 let undoStack = [];
+let placementMode = null;    // { fieldId, ghostMarker, banner, onMove, onClick, onKey }
 
 // --- Map Setup ---
 const map = L.map('map', {
@@ -731,24 +815,94 @@ function switchField(id) {
 }
 
 function addField() {
+  // If already placing, cancel the previous placement
+  if (placementMode) cancelPlacement();
+
   const name = makeUniqueName('Field ' + (state.fields.length + 1));
-  const field = {
-    id: genId(),
-    name: name,
-    nw: {
-      lat: map.getCenter().lat,
-      lng: map.getCenter().lng
-    },
-    defaultLaneWidth: DEFAULT_LANE_WIDTH,
-    defaultCropWidth: DEFAULT_CROP_WIDTH,
-    defaultLength: DEFAULT_LENGTH,
-    rows: []
-  };
-  state.fields.push(field);
-  state.activeFieldId = field.id;
-  persist();
-  populateUI();
-  renderAll();
+  const fieldId = genId();
+
+  // Create ghost crosshair marker at map center (will follow mouse)
+  const center = map.getCenter();
+  const ghostMarker = L.marker([center.lat, center.lng], {
+    icon: L.divIcon({
+      className: 'nw-marker-ghost',
+      html: '<div class="nw-ghost-crosshair-h"></div><div class="nw-ghost-crosshair-v"></div>',
+      iconSize: [60, 60], iconAnchor: [30, 30]
+    }),
+    interactive: false, zIndexOffset: 2000
+  }).addTo(map);
+
+  // Show placement banner
+  const banner = document.createElement('div');
+  banner.className = 'placement-banner';
+  banner.textContent = '📍 Click on the map to place the anchor point — Esc to cancel';
+  document.body.appendChild(banner);
+
+  // Set cursor hidden (custom crosshair replaces it)
+  map.getContainer().classList.add('placing-anchor');
+
+  // Mouse-move handler: ghost follows cursor
+  function onMove(e) {
+    ghostMarker.setLatLng(e.latlng);
+  }
+
+  // Use native click on the map container so clicks aren't eaten by Leaflet layers
+  const container = map.getContainer();
+  function onPlacementClick(e) {
+    // Only handle left-click
+    if (e.button !== 0) return;
+    // Convert pixel position to lat/lng
+    const rect = container.getBoundingClientRect();
+    const point = L.point(e.clientX - rect.left, e.clientY - rect.top);
+    const latlng = map.containerPointToLatLng(point);
+
+    // Clean up placement UI FIRST so it doesn't interfere with render
+    cleanupPlacement();
+
+    // Defer field creation to next frame so Leaflet finishes its event cycle
+    setTimeout(function() {
+      const field = {
+        id: fieldId,
+        name: name,
+        nw: { lat: latlng.lat, lng: latlng.lng },
+        defaultLaneWidth: DEFAULT_LANE_WIDTH,
+        defaultCropWidth: DEFAULT_CROP_WIDTH,
+        defaultLength: DEFAULT_LENGTH,
+        rows: []
+      };
+      state.fields.push(field);
+      state.activeFieldId = field.id;
+      persist();
+      populateUI();
+      renderAll();
+    }, 0);
+  }
+
+  // Escape key: cancel
+  function onKey(e) {
+    if (e.key === 'Escape') cancelPlacement();
+  }
+
+  map.on('mousemove', onMove);
+  container.addEventListener('click', onPlacementClick, true); // capture phase
+  document.addEventListener('keydown', onKey);
+
+  placementMode = { fieldId, ghostMarker, banner, onMove, onPlacementClick, onKey, container };
+}
+
+function cleanupPlacement() {
+  if (!placementMode) return;
+  map.off('mousemove', placementMode.onMove);
+  placementMode.container.removeEventListener('click', placementMode.onPlacementClick, true);
+  document.removeEventListener('keydown', placementMode.onKey);
+  map.removeLayer(placementMode.ghostMarker);
+  placementMode.banner.remove();
+  map.getContainer().classList.remove('placing-anchor');
+  placementMode = null;
+}
+
+function cancelPlacement() {
+  cleanupPlacement();
 }
 
 function deleteActiveField() {

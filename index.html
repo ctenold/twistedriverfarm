@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Twisted River Farm — Row Planner</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --earth: #2c1e0f;
+    --loam: #3d2b1a;
+    --clay: #5a3e28;
+    --sage: #6b8f5e;
+    --leaf: #4a7c3f;
+    --gold: #d4a843;
+    --cream: #f5f0e6;
+    --bone: #e8e0d0;
+    --parchment: #faf6ed;
+    --rust: #b5533e;
+    --sky: #5b98b5;
+    --panel-bg: rgba(44, 30, 15, 0.95);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--earth);
+    color: var(--cream);
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  #map {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  /* Leaflet tooltip overrides — crop labels (permanent, vertical) */
+  .crop-tooltip {
+    background: rgba(44, 30, 15, 0.85) !important;
+    border: 1px solid rgba(139, 196, 122, 0.6) !important;
+    color: #b5e8a5 !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    padding: 4px 6px !important;
+    border-radius: 4px !important;
+    white-space: nowrap !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+    writing-mode: vertical-rl !important;
+    text-orientation: mixed !important;
+    letter-spacing: 0.5px !important;
+  }
+  .crop-tooltip::before { display: none !important; }
+
+  /* Lane labels (hover only) */
+  .lane-tooltip {
+    background: rgba(44, 30, 15, 0.85) !important;
+    border: 1px solid rgba(200, 184, 150, 0.5) !important;
+    color: #c8b896 !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 9px !important;
+    font-weight: 600 !important;
+    padding: 3px 6px !important;
+    border-radius: 4px !important;
+    white-space: nowrap !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+  }
+  .lane-tooltip::before { display: none !important; }
+
+  /* Side Panel */
+  #panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 380px;
+    height: 100vh;
+    background: var(--panel-bg);
+    backdrop-filter: blur(12px);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid rgba(212, 168, 67, 0.2);
+    box-shadow: -4px 0 30px rgba(0,0,0,0.5);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #panel.collapsed { transform: translateX(100%); }
+
+  #panel-toggle {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 1001;
+    background: var(--panel-bg);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  #panel-toggle:hover { background: var(--gold); color: var(--earth); }
+  #panel.collapsed ~ #panel-toggle { right: 16px; }
+  #panel:not(.collapsed) ~ #panel-toggle { right: 396px; }
+
+  .panel-header {
+    padding: 20px 20px 12px;
+    border-bottom: 1px solid rgba(212, 168, 67, 0.15);
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .panel-header-left {}
+
+  .panel-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--gold);
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .panel-header .subtitle {
+    font-size: 11px;
+    color: var(--bone);
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  .io-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    margin-right: 48px;
+  }
+
+  .io-buttons button {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(212, 168, 67, 0.25);
+    color: var(--gold);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    transition: all 0.2s;
+  }
+  .io-buttons button:hover {
+    background: rgba(212, 168, 67, 0.15);
+    border-color: var(--gold);
+  }
+
+  /* NW Point Controls */
+  .nw-controls {
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(212, 168, 67, 0.15);
+    flex-shrink: 0;
+  }
+
+  .nw-controls label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--gold);
+    opacity: 0.8;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .nw-inputs {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .nw-inputs input {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(212, 168, 67, 0.2);
+    color: var(--cream);
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-family: 'DM Sans', monospace;
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .nw-inputs input:focus {
+    border-color: var(--gold);
+  }
+
+  .nw-inputs button {
+    background: var(--sage);
+    border: none;
+    color: white;
+    padding: 7px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .nw-inputs button:hover { background: var(--leaf); }
+
+  /* Default controls */
+  .defaults-bar {
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(212, 168, 67, 0.15);
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .default-group {
+    flex: 1;
+  }
+
+  .default-group label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--bone);
+    opacity: 0.5;
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .default-group input {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(212, 168, 67, 0.15);
+    color: var(--cream);
+    padding: 5px 8px;
+    border-radius: 5px;
+    font-size: 12px;
+    outline: none;
+  }
+  .default-group input:focus { border-color: var(--gold); }
+
+  /* Row list */
+  .row-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+
+  .row-list::-webkit-scrollbar { width: 6px; }
+  .row-list::-webkit-scrollbar-track { background: transparent; }
+  .row-list::-webkit-scrollbar-thumb { background: rgba(212, 168, 67, 0.25); border-radius: 3px; }
+
+  .row-item {
+    padding: 10px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.15s;
+    cursor: default;
+  }
+  .row-item:hover { background: rgba(255,255,255,0.03); }
+
+  .row-item-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .row-type-badge {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .row-type-badge.lane {
+    background: rgba(180, 160, 130, 0.25);
+    color: #c8b896;
+  }
+
+  .row-type-badge.crop {
+    background: rgba(74, 124, 63, 0.3);
+    color: #8bc47a;
+  }
+
+  .row-name {
+    font-weight: 600;
+    font-size: 13px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .row-name.lane-name { color: #c8b896; }
+  .row-name.crop-name { color: #8bc47a; }
+
+  .row-controls {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .row-controls select,
+  .row-controls input {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--cream);
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+  }
+  .row-controls select { cursor: pointer; }
+  .row-controls select:focus,
+  .row-controls input:focus { border-color: var(--gold); }
+
+  .row-controls input { width: 52px; text-align: center; }
+  .row-controls select { width: 70px; }
+
+  .row-dims {
+    font-size: 10px;
+    color: var(--bone);
+    opacity: 0.45;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .row-actions {
+    display: flex;
+    gap: 4px;
+  }
+
+  .row-actions button {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--bone);
+    opacity: 0.4;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .row-actions button:hover { opacity: 1; border-color: var(--gold); color: var(--gold); }
+  .row-actions button.delete:hover { border-color: var(--rust); color: var(--rust); }
+
+  /* Add row button */
+  .add-row-bar {
+    padding: 12px 20px;
+    border-top: 1px solid rgba(212, 168, 67, 0.15);
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+  }
+
+  .add-row-bar button {
+    flex: 1;
+    padding: 9px;
+    border-radius: 6px;
+    border: 1px dashed rgba(212, 168, 67, 0.3);
+    background: rgba(212, 168, 67, 0.05);
+    color: var(--gold);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .add-row-bar button:hover {
+    background: rgba(212, 168, 67, 0.12);
+    border-color: var(--gold);
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    padding: 10px 20px;
+    border-top: 1px solid rgba(212, 168, 67, 0.15);
+    font-size: 11px;
+    color: var(--bone);
+    opacity: 0.6;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* NW marker */
+  .nw-marker-icon {
+    background: var(--gold);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 3px solid var(--earth);
+    box-shadow: 0 0 0 2px var(--gold), 0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  /* Hidden file input */
+  #import-input { display: none; }
+
+  /* Dimension overlay on map */
+  .dim-tooltip {
+    background: rgba(0,0,0,0.7) !important;
+    border: none !important;
+    color: #fff !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 9px !important;
+    font-weight: 600 !important;
+    padding: 2px 5px !important;
+    border-radius: 3px !important;
+    white-space: nowrap !important;
+    box-shadow: none !important;
+  }
+  .dim-tooltip::before { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<button id="panel-toggle" title="Toggle Panel">☰</button>
+<input type="file" id="import-input" accept=".json" />
+
+<div id="panel">
+  <div class="panel-header">
+    <div class="panel-header-left">
+      <h1>Twisted River Farm</h1>
+      <div class="subtitle">Row Planner — Mitchell, IA</div>
+    </div>
+    <div class="io-buttons">
+      <button onclick="exportJSON()" title="Export layout as JSON">Export</button>
+      <button onclick="document.getElementById('import-input').click()" title="Import layout from JSON">Import</button>
+    </div>
+  </div>
+
+  <div class="nw-controls">
+    <label>Northwest Anchor Point</label>
+    <div class="nw-inputs">
+      <input type="text" id="nw-lat" placeholder="Lat" />
+      <input type="text" id="nw-lng" placeholder="Lng" />
+      <button onclick="updateAnchor()">Set</button>
+    </div>
+  </div>
+
+  <div class="defaults-bar">
+    <div class="default-group">
+      <label>Lane Width (ft)</label>
+      <input type="number" id="default-lane-width" value="6" min="0.5" step="0.5" onchange="saveState()" />
+    </div>
+    <div class="default-group">
+      <label>Crop Width (ft)</label>
+      <input type="number" id="default-crop-width" value="24" min="0.5" step="0.5" onchange="saveState()" />
+    </div>
+    <div class="default-group">
+      <label>Row Length (ft)</label>
+      <input type="number" id="default-length" value="250" min="1" step="1" onchange="saveState()" />
+    </div>
+  </div>
+
+  <div class="row-list" id="row-list"></div>
+
+  <div class="add-row-bar">
+    <button onclick="addRow('lane')">+ Lane</button>
+    <button onclick="addRow('crop')">+ Crop Row</button>
+  </div>
+
+  <div class="stats-bar">
+    <span id="stats-count">0 rows</span>
+    <span id="stats-width">Total: 0 ft</span>
+  </div>
+</div>
+
+<script>
+// --- Constants ---
+const FT_TO_M = 0.3048;
+const M_PER_DEG_LAT = 111132.92; // at ~43° lat
+const DEFAULT_NW = { lat: 43.32251614380451, lng: -92.86184191703798 };
+
+const DEFAULT_LANE_WIDTH = 6;
+const DEFAULT_CROP_WIDTH = 24;
+const DEFAULT_LENGTH = 250;
+
+const INITIAL_CROPS = [
+  "Spring Brassica A","Spring Brassica B",
+  "Onions","Onions",
+  "Garlic",
+  "Corn","Corn","Corn","Corn","Corn","Corn",
+  "Beans","Beans",
+  "Potatoes",
+  "Yukon+Carrots","Sweet Pot+Beets",
+  "Tom/Peppers",
+  "Fall Brass","Fall Brass","Fall Brass",
+  "Lettuce","Sunflowers","Cantaloupe","Canary","Winter Squash"
+];
+
+// --- State ---
+let state = loadState();
+
+// --- Map Setup ---
+function getFieldCenter() {
+  const totalWidth = state.rows.reduce((s, r) => s + r.width, 0);
+  const maxLength = Math.max(...state.rows.map(r => r.length), 0);
+  return [
+    state.nw.lat - ftToLatDeg(maxLength / 2),
+    state.nw.lng + ftToLngDeg(totalWidth / 2, state.nw.lat)
+  ];
+}
+
+const map = L.map('map', {
+  center: getFieldCenter(),
+  zoom: 19,
+  maxZoom: 22
+});
+
+// Google Satellite tiles (highest res)
+L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+  maxZoom: 22,
+  maxNativeZoom: 21,
+  attribution: '&copy; Google'
+}).addTo(map);
+
+let rowLayers = [];      // rectangles
+let labelLayers = [];    // separate label markers for crop vertical text
+let dimPolylines = [];   // dimension lines
+let nwMarker = null;
+
+// --- Init ---
+document.getElementById('nw-lat').value = state.nw.lat;
+document.getElementById('nw-lng').value = state.nw.lng;
+document.getElementById('default-lane-width').value = state.defaultLaneWidth;
+document.getElementById('default-crop-width').value = state.defaultCropWidth;
+document.getElementById('default-length').value = state.defaultLength;
+
+renderAll();
+
+// --- Import handler ---
+document.getElementById('import-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (imported.rows && imported.nw) {
+        state = imported;
+        localStorage.setItem('twistedriver-rows', JSON.stringify(state));
+        document.getElementById('nw-lat').value = state.nw.lat;
+        document.getElementById('nw-lng').value = state.nw.lng;
+        document.getElementById('default-lane-width').value = state.defaultLaneWidth;
+        document.getElementById('default-crop-width').value = state.defaultCropWidth;
+        document.getElementById('default-length').value = state.defaultLength;
+        renderAll();
+        fitMapToRows();
+        map.setView([state.nw.lat, state.nw.lng], map.getZoom());
+      } else {
+        alert('Invalid JSON: missing rows or nw fields');
+      }
+    } catch(err) {
+      alert('Failed to parse JSON: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = ''; // reset so same file can re-import
+});
+
+// --- Functions ---
+function loadState() {
+  const saved = localStorage.getItem('twistedriver-rows');
+  if (saved) {
+    try { return JSON.parse(saved); } catch(e) {}
+  }
+  return buildInitialState();
+}
+
+function buildInitialState() {
+  const rows = [];
+  const counts = {};
+  const totals = {};
+  INITIAL_CROPS.forEach(c => { totals[c] = (totals[c] || 0) + 1; });
+
+  INITIAL_CROPS.forEach((cropName, i) => {
+    // Lane before each crop
+    rows.push({
+      id: genId(),
+      type: 'lane',
+      name: `Lane ${i + 1}`,
+      width: DEFAULT_LANE_WIDTH,
+      length: DEFAULT_LENGTH,
+      widthOverride: false,
+      lengthOverride: false
+    });
+
+    let label = cropName;
+    if (totals[cropName] > 1) {
+      counts[cropName] = (counts[cropName] || 0) + 1;
+      label = `${cropName} ${counts[cropName]}`;
+    }
+
+    rows.push({
+      id: genId(),
+      type: 'crop',
+      name: label,
+      width: DEFAULT_CROP_WIDTH,
+      length: DEFAULT_LENGTH,
+      widthOverride: false,
+      lengthOverride: false
+    });
+  });
+
+  // Final lane
+  rows.push({
+    id: genId(),
+    type: 'lane',
+    name: `Lane ${INITIAL_CROPS.length + 1}`,
+    width: DEFAULT_LANE_WIDTH,
+    length: DEFAULT_LENGTH,
+    widthOverride: false,
+    lengthOverride: false
+  });
+
+  return {
+    nw: { ...DEFAULT_NW },
+    defaultLaneWidth: DEFAULT_LANE_WIDTH,
+    defaultCropWidth: DEFAULT_CROP_WIDTH,
+    defaultLength: DEFAULT_LENGTH,
+    rows
+  };
+}
+
+function genId() {
+  return 'r' + Math.random().toString(36).substring(2, 10);
+}
+
+function saveState() {
+  state.defaultLaneWidth = parseFloat(document.getElementById('default-lane-width').value) || DEFAULT_LANE_WIDTH;
+  state.defaultCropWidth = parseFloat(document.getElementById('default-crop-width').value) || DEFAULT_CROP_WIDTH;
+  state.defaultLength = parseFloat(document.getElementById('default-length').value) || DEFAULT_LENGTH;
+
+  state.rows.forEach(r => {
+    if (!r.widthOverride) {
+      r.width = r.type === 'lane' ? state.defaultLaneWidth : state.defaultCropWidth;
+    }
+    if (!r.lengthOverride) {
+      r.length = state.defaultLength;
+    }
+  });
+
+  localStorage.setItem('twistedriver-rows', JSON.stringify(state));
+  renderAll();
+}
+
+function updateAnchor() {
+  const lat = parseFloat(document.getElementById('nw-lat').value);
+  const lng = parseFloat(document.getElementById('nw-lng').value);
+  if (!isNaN(lat) && !isNaN(lng)) {
+    state.nw = { lat, lng };
+    saveState();
+    map.setView([lat, lng], map.getZoom());
+  }
+}
+
+function addRow(type) {
+  const name = type === 'lane'
+    ? `Lane ${state.rows.filter(r => r.type === 'lane').length + 1}`
+    : `New Crop`;
+  state.rows.push({
+    id: genId(),
+    type,
+    name,
+    width: type === 'lane' ? state.defaultLaneWidth : state.defaultCropWidth,
+    length: state.defaultLength,
+    widthOverride: false,
+    lengthOverride: false
+  });
+  saveState();
+}
+
+function deleteRow(id) {
+  state.rows = state.rows.filter(r => r.id !== id);
+  saveState();
+}
+
+function moveRow(id, dir) {
+  const idx = state.rows.findIndex(r => r.id === id);
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= state.rows.length) return;
+  [state.rows[idx], state.rows[newIdx]] = [state.rows[newIdx], state.rows[idx]];
+  saveState();
+}
+
+function updateRowField(id, field, value) {
+  const row = state.rows.find(r => r.id === id);
+  if (!row) return;
+
+  if (field === 'name') {
+    row.name = value;
+  } else if (field === 'type') {
+    row.type = value;
+    if (!row.widthOverride) {
+      row.width = value === 'lane' ? state.defaultLaneWidth : state.defaultCropWidth;
+    }
+  } else if (field === 'width') {
+    const v = parseFloat(value);
+    if (!isNaN(v) && v > 0) {
+      row.width = v;
+      row.widthOverride = true;
+    }
+  } else if (field === 'length') {
+    const v = parseFloat(value);
+    if (!isNaN(v) && v > 0) {
+      row.length = v;
+      row.lengthOverride = true;
+    }
+  }
+  saveState();
+}
+
+// --- Export / Import ---
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'twisted-river-farm-layout.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// --- Geo helpers ---
+function mPerDegLng(lat) {
+  return 111320 * Math.cos(lat * Math.PI / 180);
+}
+
+function ftToLatDeg(ft) {
+  return (ft * FT_TO_M) / M_PER_DEG_LAT;
+}
+
+function ftToLngDeg(ft, lat) {
+  return (ft * FT_TO_M) / mPerDegLng(lat);
+}
+
+// --- Render ---
+function renderAll() {
+  renderList();
+  renderMap();
+  updateStats();
+}
+
+function updateStats() {
+  const totalWidth = state.rows.reduce((s, r) => s + r.width, 0);
+  const cropArea = state.rows.filter(r => r.type === 'crop').reduce((s, r) => s + r.width * r.length, 0);
+  document.getElementById('stats-count').textContent =
+    `${state.rows.length} rows (${state.rows.filter(r=>r.type==='crop').length} crop)`;
+  document.getElementById('stats-width').textContent =
+    `Width: ${totalWidth.toFixed(1)} ft · Crop area: ${(cropArea / 43560).toFixed(2)} ac`;
+}
+
+function renderList() {
+  const container = document.getElementById('row-list');
+  container.innerHTML = state.rows.map((row, idx) => `
+    <div class="row-item" data-id="${row.id}">
+      <div class="row-item-header">
+        <span class="row-type-badge ${row.type}">${row.type}</span>
+        <input
+          class="row-name ${row.type === 'lane' ? 'lane-name' : 'crop-name'}"
+          value="${escHtml(row.name)}"
+          onchange="updateRowField('${row.id}', 'name', this.value)"
+          style="background:none;border:none;font-size:13px;font-weight:600;font-family:inherit;color:inherit;outline:none;flex:1;min-width:0;padding:2px 4px;border-radius:3px;"
+          onfocus="this.style.background='rgba(255,255,255,0.06)'"
+          onblur="this.style.background='none'"
+        />
+        <div class="row-actions">
+          <button onclick="moveRow('${row.id}', -1)" title="Move up">▲</button>
+          <button onclick="moveRow('${row.id}', 1)" title="Move down">▼</button>
+          <button class="delete" onclick="deleteRow('${row.id}')" title="Delete">✕</button>
+        </div>
+      </div>
+      <div class="row-controls">
+        <select onchange="updateRowField('${row.id}', 'type', this.value)">
+          <option value="lane" ${row.type === 'lane' ? 'selected' : ''}>Lane</option>
+          <option value="crop" ${row.type === 'crop' ? 'selected' : ''}>Crop</option>
+        </select>
+        <label style="font-size:10px;color:var(--bone);opacity:0.5;">W</label>
+        <input type="number" value="${row.width}" min="0.5" step="0.5"
+          onchange="updateRowField('${row.id}', 'width', this.value)"
+          style="${row.widthOverride ? 'border-color: var(--gold);' : ''}"
+          title="Width (ft)" />
+        <label style="font-size:10px;color:var(--bone);opacity:0.5;">L</label>
+        <input type="number" value="${row.length}" min="1" step="1"
+          onchange="updateRowField('${row.id}', 'length', this.value)"
+          style="${row.lengthOverride ? 'border-color: var(--gold);' : ''}"
+          title="Length (ft)" />
+        <span class="row-dims">${row.width}×${row.length} ft</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderMap() {
+  // Clear old layers
+  rowLayers.forEach(r => map.removeLayer(r));
+  labelLayers.forEach(r => map.removeLayer(r));
+  dimPolylines.forEach(r => map.removeLayer(r));
+  rowLayers = [];
+  labelLayers = [];
+  dimPolylines = [];
+  if (nwMarker) { map.removeLayer(nwMarker); }
+
+  // NW draggable marker
+  nwMarker = L.marker([state.nw.lat, state.nw.lng], {
+    icon: L.divIcon({
+      className: 'nw-marker-icon',
+      iconSize: [14, 14],
+      iconAnchor: [7, 7]
+    }),
+    draggable: true,
+    zIndexOffset: 1000
+  }).addTo(map);
+
+  nwMarker.on('dragend', function(e) {
+    const pos = e.target.getLatLng();
+    state.nw = { lat: pos.lat, lng: pos.lng };
+    document.getElementById('nw-lat').value = pos.lat.toFixed(14);
+    document.getElementById('nw-lng').value = pos.lng.toFixed(14);
+    saveState();
+  });
+
+  // Draw rows west→east
+  let offsetEastFt = 0;
+
+  state.rows.forEach((row, idx) => {
+    const westLng = state.nw.lng + ftToLngDeg(offsetEastFt, state.nw.lat);
+    const eastLng = state.nw.lng + ftToLngDeg(offsetEastFt + row.width, state.nw.lat);
+    const northLat = state.nw.lat;
+    const southLat = state.nw.lat - ftToLatDeg(row.length);
+
+    const bounds = [[northLat, westLng], [southLat, eastLng]];
+
+    const isLane = row.type === 'lane';
+    const color = isLane ? '#b0a080' : '#5eaa4e';
+    const fillColor = isLane
+      ? 'rgba(180, 160, 130, 0.30)'
+      : 'rgba(74, 160, 55, 0.35)';
+
+    const rect = L.rectangle(bounds, {
+      color: color,
+      weight: 1,
+      fillColor: fillColor,
+      fillOpacity: 1,
+      opacity: 0.7
+    }).addTo(map);
+
+    if (isLane) {
+      // Lane: hover-only tooltip (horizontal)
+      rect.bindTooltip(row.name, {
+        permanent: false,
+        direction: 'center',
+        className: 'lane-tooltip'
+      });
+    } else {
+      // Crop: permanent vertical label
+      // We'll use a divIcon marker at the center of the rect for rotated text
+      const centerLat = (northLat + southLat) / 2;
+      const centerLng = (westLng + eastLng) / 2;
+
+      const labelMarker = L.marker([centerLat, centerLng], {
+        icon: L.divIcon({
+          className: '',
+          html: `<div style="
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: #b5e8a5;
+            text-shadow: 0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7);
+            white-space: nowrap;
+            pointer-events: none;
+            letter-spacing: 0.5px;
+          ">${escHtml(row.name)}</div>`,
+          iconSize: [0, 0],
+          iconAnchor: [0, 0]
+        }),
+        interactive: false
+      }).addTo(map);
+
+      labelLayers.push(labelMarker);
+    }
+
+    rowLayers.push(rect);
+    offsetEastFt += row.width;
+  });
+
+  // Draw overall dimension line along the top (width) and left (length)
+  renderDimensions(offsetEastFt);
+}
+
+function renderDimensions(totalWidthFt) {
+  if (state.rows.length === 0) return;
+
+  // Find max length
+  const maxLength = Math.max(...state.rows.map(r => r.length));
+
+  // Top width dimension line
+  const topLat = state.nw.lat + ftToLatDeg(3); // slightly above
+  const leftLng = state.nw.lng;
+  const rightLng = state.nw.lng + ftToLngDeg(totalWidthFt, state.nw.lat);
+
+  const widthLine = L.polyline([[topLat, leftLng], [topLat, rightLng]], {
+    color: '#d4a843',
+    weight: 2,
+    dashArray: '6,4',
+    opacity: 0.7
+  }).addTo(map);
+
+  widthLine.bindTooltip(`${totalWidthFt.toFixed(1)} ft`, {
+    permanent: true,
+    direction: 'top',
+    className: 'dim-tooltip',
+    offset: [0, -4]
+  });
+  dimPolylines.push(widthLine);
+
+  // Left length dimension line
+  const leftLngOffset = state.nw.lng - ftToLngDeg(3, state.nw.lat);
+  const bottomLat = state.nw.lat - ftToLatDeg(maxLength);
+
+  const lengthLine = L.polyline([[state.nw.lat, leftLngOffset], [bottomLat, leftLngOffset]], {
+    color: '#d4a843',
+    weight: 2,
+    dashArray: '6,4',
+    opacity: 0.7
+  }).addTo(map);
+
+  lengthLine.bindTooltip(`${maxLength.toFixed(0)} ft`, {
+    permanent: true,
+    direction: 'left',
+    className: 'dim-tooltip',
+    offset: [-4, 0]
+  });
+  dimPolylines.push(lengthLine);
+}
+
+function fitMapToRows() {
+  if (state.rows.length === 0) return;
+  const totalWidth = state.rows.reduce((s, r) => s + r.width, 0);
+  const maxLength = Math.max(...state.rows.map(r => r.length));
+  const se = [
+    state.nw.lat - ftToLatDeg(maxLength),
+    state.nw.lng + ftToLngDeg(totalWidth, state.nw.lat)
+  ];
+  map.fitBounds([[state.nw.lat, state.nw.lng], se], { padding: [60, 400, 60, 60], maxZoom: 20 });
+}
+
+// Panel toggle
+document.getElementById('panel-toggle').addEventListener('click', function() {
+  document.getElementById('panel').classList.toggle('collapsed');
+});
+</script>
+</body>
+</html>

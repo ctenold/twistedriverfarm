@@ -636,6 +636,202 @@
     background: rgba(212, 168, 67, 0.15);
     border-color: var(--gold);
   }
+
+  /* ── Spreadsheet Overlay ── */
+  #spreadsheet-overlay {
+    position: fixed; inset: 0; z-index: 2000;
+    background: rgba(20, 15, 10, 0.97);
+    display: none; flex-direction: column;
+    font-family: 'DM Sans', sans-serif;
+    animation: ssOverlayIn 0.25s ease-out;
+  }
+  #spreadsheet-overlay.open { display: flex; }
+  @keyframes ssOverlayIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .ss-toolbar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 24px;
+    border-bottom: 1px solid rgba(212, 168, 67, 0.2);
+    flex-shrink: 0;
+  }
+  .ss-toolbar h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; color: var(--gold);
+    margin-right: auto;
+  }
+  .ss-toolbar label {
+    font-size: 11px; color: var(--bone); opacity: 0.7;
+    display: flex; align-items: center; gap: 5px; cursor: pointer;
+    user-select: none;
+  }
+  .ss-toolbar label input[type="checkbox"] {
+    accent-color: var(--gold);
+  }
+  .ss-toolbar button {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(212, 168, 67, 0.25);
+    color: var(--gold); padding: 6px 14px; border-radius: 6px;
+    cursor: pointer; font-size: 11px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    transition: all 0.2s;
+  }
+  .ss-toolbar button:hover {
+    background: rgba(212, 168, 67, 0.15);
+    border-color: var(--gold);
+  }
+  .ss-toolbar button.ss-close {
+    background: none; border: 1px solid rgba(255,255,255,0.15);
+    color: var(--bone); font-size: 18px; padding: 4px 10px;
+    line-height: 1;
+  }
+  .ss-toolbar button.ss-close:hover {
+    border-color: var(--rust); color: var(--rust);
+  }
+
+  .ss-table-wrap {
+    flex: 1; overflow: auto; padding: 0 24px 24px;
+  }
+  .ss-table-wrap::-webkit-scrollbar { width: 8px; height: 8px; }
+  .ss-table-wrap::-webkit-scrollbar-track { background: transparent; }
+  .ss-table-wrap::-webkit-scrollbar-thumb { background: rgba(212, 168, 67, 0.25); border-radius: 4px; }
+
+  #ss-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 12px; margin-top: 12px;
+  }
+  #ss-table thead { position: sticky; top: 0; z-index: 2; }
+  #ss-table th {
+    background: var(--loam);
+    color: var(--gold);
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 8px 10px;
+    border-bottom: 2px solid rgba(212, 168, 67, 0.3);
+    text-align: left; white-space: nowrap;
+    cursor: pointer; user-select: none;
+    position: relative;
+  }
+  #ss-table th:hover { background: var(--clay); }
+  #ss-table th .ss-sort-arrow {
+    font-size: 10px; margin-left: 4px; opacity: 0.4;
+  }
+  #ss-table th.ss-sorted .ss-sort-arrow { opacity: 1; color: var(--gold); }
+
+  #ss-table th input.ss-filter {
+    display: block; width: 100%; margin-top: 5px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--cream); padding: 3px 6px; border-radius: 3px;
+    font-size: 10px; font-family: 'DM Sans', sans-serif;
+    outline: none;
+  }
+  #ss-table th input.ss-filter:focus { border-color: var(--gold); }
+  #ss-table th input.ss-filter::placeholder { color: rgba(255,255,255,0.25); }
+
+  #ss-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--cream);
+    vertical-align: top;
+  }
+  #ss-table tbody tr:hover td { background: rgba(255,255,255,0.03); }
+
+  #ss-table td input,
+  #ss-table td select {
+    background: none; border: 1px solid transparent;
+    color: var(--cream); padding: 3px 5px; border-radius: 3px;
+    font-size: 12px; font-family: 'DM Sans', sans-serif;
+    outline: none; width: 100%;
+  }
+  #ss-table td input:hover,
+  #ss-table td select:hover { border-color: rgba(255,255,255,0.1); }
+  #ss-table td input:focus,
+  #ss-table td select:focus {
+    border-color: var(--gold);
+    background: rgba(255,255,255,0.04);
+  }
+  #ss-table td input[type="number"] { width: 65px; text-align: right; }
+  #ss-table td input[type="date"] { color-scheme: dark; }
+  #ss-table td select { cursor: pointer; width: 70px; }
+  #ss-table td select option { background: var(--loam); color: var(--cream); }
+
+  .ss-type-badge {
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; padding: 2px 6px; border-radius: 3px;
+    display: inline-block;
+  }
+  .ss-type-badge.lane { background: rgba(180, 160, 130, 0.25); color: #c8b896; }
+  .ss-type-badge.crop { background: rgba(74, 124, 63, 0.3); color: #8bc47a; }
+
+  .ss-count-bar {
+    padding: 10px 24px;
+    border-top: 1px solid rgba(212, 168, 67, 0.15);
+    font-size: 11px; color: var(--bone); opacity: 0.6;
+    flex-shrink: 0; display: flex; justify-content: space-between;
+  }
+
+  .ss-range-filter {
+    margin-top: 5px;
+    display: flex; gap: 3px; align-items: center;
+  }
+  .ss-range-filter input[type="number"] {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--cream); padding: 2px 4px; border-radius: 3px;
+    font-size: 9px; font-family: 'DM Sans', sans-serif;
+    outline: none; width: 50%; text-align: center;
+  }
+  .ss-range-filter input[type="number"]:focus { border-color: var(--gold); }
+  .ss-range-filter input[type="number"]::placeholder { color: rgba(255,255,255,0.25); }
+
+  .ss-dropdown-filter {
+    position: relative; display: inline-block; width: 100%; margin-top: 5px;
+  }
+  .ss-dropdown-btn {
+    display: block; width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--cream); padding: 3px 6px; border-radius: 3px;
+    font-size: 10px; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; text-align: left;
+  }
+  .ss-dropdown-btn:hover { border-color: rgba(255,255,255,0.2); }
+  .ss-dropdown-panel {
+    display: none; position: absolute; top: 100%; left: 0;
+    background: var(--loam); border: 1px solid rgba(212,168,67,0.3);
+    border-radius: 4px; padding: 4px 0; min-width: 140px;
+    max-height: 200px; overflow-y: auto; z-index: 10;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  }
+  .ss-dropdown-panel.open { display: block; }
+  .ss-dropdown-panel label {
+    display: flex; align-items: center; gap: 6px;
+    padding: 3px 10px; font-size: 11px; color: var(--cream);
+    cursor: pointer; white-space: nowrap;
+  }
+  .ss-dropdown-panel label:hover { background: rgba(255,255,255,0.06); }
+  .ss-dropdown-panel input[type="checkbox"] { accent-color: var(--gold); }
+
+  .ss-date-filter {
+    margin-top: 5px;
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .ss-date-filter input[type="date"] {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--cream); padding: 2px 4px; border-radius: 3px;
+    font-size: 9px; font-family: 'DM Sans', sans-serif;
+    outline: none; color-scheme: dark; width: 100%;
+  }
+  .ss-date-filter input[type="date"]:focus { border-color: var(--gold); }
+  .ss-date-filter span {
+    font-size: 8px; color: var(--bone); opacity: 0.5;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
 </style>
 </head>
 <body>
@@ -649,6 +845,27 @@
   <label>📅 View as of</label>
   <input type="date" id="view-date-input" />
   <button onclick="resetViewDate()">Today</button>
+  <span style="width:1px;height:20px;background:rgba(212,168,67,0.3);margin:0 4px;"></span>
+  <button onclick="openSpreadsheet()" title="Open Spreadsheet">📊 Spreadsheet</button>
+</div>
+
+<div id="spreadsheet-overlay">
+  <div class="ss-toolbar">
+    <h2>📊 Crop Spreadsheet</h2>
+    <label><input type="checkbox" id="ss-show-lanes" onchange="renderSpreadsheetFull()"> Show Lanes</label>
+    <button onclick="exportSpreadsheetCSV()">⬇ Download CSV</button>
+    <button class="ss-close" onclick="closeSpreadsheet()" title="Close">✕</button>
+  </div>
+  <div class="ss-table-wrap">
+    <table id="ss-table">
+      <thead id="ss-thead"></thead>
+      <tbody id="ss-tbody"></tbody>
+    </table>
+  </div>
+  <div class="ss-count-bar">
+    <span id="ss-count"></span>
+    <span id="ss-summary"></span>
+  </div>
 </div>
 
 <div id="panel">
@@ -1801,6 +2018,369 @@ function toggleAllLanes() {
 // Panel toggle
 document.getElementById('panel-toggle').addEventListener('click', function() {
   document.getElementById('panel').classList.toggle('collapsed');
+});
+
+// ── Spreadsheet View ──
+let ssSort = { col: null, asc: true };
+let ssFilters = {};
+
+const SS_COLUMNS = [
+  { key: 'field',      label: 'Field',      editable: false, filterType: 'dropdown' },
+  { key: 'rowName',    label: 'Row',        editable: true, editField: 'name', filterType: 'text' },
+  { key: 'type',       label: 'Type',       editable: false, filterType: 'dropdown' },
+  { key: 'cropName',   label: 'Crop',       editable: true, plantingField: 'cropName', filterType: 'text' },
+  { key: 'plantDate',  label: 'Plant Date', editable: true, plantingField: 'plantDate', inputType: 'date', filterType: 'date' },
+  { key: 'age',        label: 'Age (d)',     editable: false, filterType: 'range' },
+  { key: 'width',      label: 'Width (ft)', editable: true, editField: 'width', inputType: 'number', filterType: 'range' },
+  { key: 'length',     label: 'Length (ft)', editable: true, editField: 'length', inputType: 'number', filterType: 'range' },
+  { key: 'notes',      label: 'Notes',      editable: true, plantingField: 'notes', filterType: 'text' },
+  { key: 'fertility',  label: 'Fertility',  editable: true, plantingField: 'fertilityNotes', filterType: 'text' },
+  { key: 'harvest',    label: 'Harvest',    editable: true, plantingField: 'harvestData', filterType: 'text' },
+  { key: 'treatments', label: 'Treatments', editable: true, plantingField: 'treatments', filterType: 'text' }
+];
+
+function openSpreadsheet() {
+  document.getElementById('spreadsheet-overlay').classList.add('open');
+  renderSpreadsheetFull();
+}
+
+function closeSpreadsheet() {
+  document.getElementById('spreadsheet-overlay').classList.remove('open');
+  // Close any open dropdown panels
+  document.querySelectorAll('.ss-dropdown-panel.open').forEach(p => p.classList.remove('open'));
+}
+
+function gatherSpreadsheetData() {
+  const showLanes = document.getElementById('ss-show-lanes').checked;
+  const rows = [];
+  state.fields.forEach(field => {
+    field.rows.forEach(row => {
+      if (!showLanes && row.type === 'lane') return;
+      if (row.type === 'crop' && row.plantings && row.plantings.length > 0) {
+        row.plantings.forEach(p => {
+          rows.push({
+            fieldId: field.id, fieldName: field.name,
+            rowId: row.id, plantingId: p.id,
+            field: field.name,
+            rowName: row.name,
+            type: row.type,
+            cropName: p.cropName || '',
+            plantDate: p.plantDate || '',
+            age: getDaysAge(p.plantDate),
+            width: row.width,
+            length: row.length,
+            notes: p.notes || '',
+            fertility: p.fertilityNotes || '',
+            harvest: p.harvestData || '',
+            treatments: p.treatments || ''
+          });
+        });
+      } else {
+        rows.push({
+          fieldId: field.id, fieldName: field.name,
+          rowId: row.id, plantingId: null,
+          field: field.name,
+          rowName: row.name,
+          type: row.type,
+          cropName: '',
+          plantDate: '',
+          age: null,
+          width: row.width,
+          length: row.length,
+          notes: '', fertility: '', harvest: '', treatments: ''
+        });
+      }
+    });
+  });
+  return rows;
+}
+
+function filterAndSortData(data) {
+  let filtered = data.filter(row => {
+    return SS_COLUMNS.every(col => {
+      const f = ssFilters[col.key];
+      if (f == null || f === '' || (Array.isArray(f) && f.length === 0)) return true;
+
+      if (col.filterType === 'dropdown') {
+        if (!Array.isArray(f) || f.length === 0) return true;
+        return f.includes(String(row[col.key]));
+      }
+      if (col.filterType === 'date') {
+        if (typeof f === 'object' && !Array.isArray(f)) {
+          const val = row[col.key] || '';
+          if (f.after && val < f.after) return false;
+          if (f.before && val > f.before) return false;
+          return true;
+        }
+        return true;
+      }
+      if (col.filterType === 'range') {
+        if (typeof f === 'object' && !Array.isArray(f)) {
+          const val = row[col.key];
+          if (val == null) return !(f.min != null || f.max != null);
+          if (f.min != null && val < f.min) return false;
+          if (f.max != null && val > f.max) return false;
+          return true;
+        }
+        return true;
+      }
+      // text
+      const val = String(row[col.key] ?? '').toLowerCase();
+      return val.includes(String(f).toLowerCase());
+    });
+  });
+
+  if (ssSort.col) {
+    filtered.sort((a, b) => {
+      let va = a[ssSort.col], vb = b[ssSort.col];
+      if (va == null) va = '';
+      if (vb == null) vb = '';
+      if (typeof va === 'number' && typeof vb === 'number') return ssSort.asc ? va - vb : vb - va;
+      va = String(va).toLowerCase();
+      vb = String(vb).toLowerCase();
+      if (va < vb) return ssSort.asc ? -1 : 1;
+      if (va > vb) return ssSort.asc ? 1 : -1;
+      return 0;
+    });
+  }
+  return filtered;
+}
+
+function renderSpreadsheetFull() {
+  renderSpreadsheetHead();
+  renderSpreadsheetBody();
+}
+
+function renderSpreadsheetHead() {
+  const allData = gatherSpreadsheetData();
+  const thead = document.getElementById('ss-thead');
+  thead.innerHTML = '<tr>' + SS_COLUMNS.map(col => {
+    const isSorted = ssSort.col === col.key;
+    const arrow = isSorted ? (ssSort.asc ? '▲' : '▼') : '⇅';
+    const cls = isSorted ? ' class="ss-sorted"' : '';
+    let filterHtml = '';
+
+    if (col.filterType === 'dropdown') {
+      const uniqueVals = [...new Set(allData.map(r => String(r[col.key])))].sort();
+      const selected = Array.isArray(ssFilters[col.key]) ? ssFilters[col.key] : [];
+      const btnLabel = selected.length === 0 ? 'All' : selected.length + ' selected';
+      filterHtml = `<div class="ss-dropdown-filter">
+        <button class="ss-dropdown-btn" onclick="event.stopPropagation(); ssToggleDropdown(this)">${btnLabel}</button>
+        <div class="ss-dropdown-panel" onclick="event.stopPropagation()">
+          ${uniqueVals.map(v => `<label><input type="checkbox" value="${escHtml(v)}"
+            ${selected.includes(v) ? 'checked' : ''}
+            onchange="ssDropdownChange('${col.key}', this)"> ${escHtml(v)}</label>`).join('')}
+        </div>
+      </div>`;
+    } else if (col.filterType === 'range') {
+      const rf = (typeof ssFilters[col.key] === 'object' && !Array.isArray(ssFilters[col.key])) ? ssFilters[col.key] : {};
+      filterHtml = `<div class="ss-range-filter" onclick="event.stopPropagation()">
+        <input type="number" placeholder="Min" value="${rf.min != null ? rf.min : ''}"
+          onchange="ssRangeFilterChange('${col.key}','min',this.value)" />
+        <input type="number" placeholder="Max" value="${rf.max != null ? rf.max : ''}"
+          onchange="ssRangeFilterChange('${col.key}','max',this.value)" />
+      </div>`;
+    } else if (col.filterType === 'date') {
+      const df = (typeof ssFilters[col.key] === 'object' && !Array.isArray(ssFilters[col.key])) ? ssFilters[col.key] : {};
+      filterHtml = `<div class="ss-date-filter" onclick="event.stopPropagation()">
+        <span>After</span>
+        <input type="date" value="${df.after || ''}" onchange="ssDateFilterChange('${col.key}','after',this.value)" />
+        <span>Before</span>
+        <input type="date" value="${df.before || ''}" onchange="ssDateFilterChange('${col.key}','before',this.value)" />
+      </div>`;
+    } else {
+      const filterVal = escHtml(ssFilters[col.key] || '');
+      filterHtml = `<input class="ss-filter" type="text" placeholder="Filter…"
+        value="${filterVal}"
+        onclick="event.stopPropagation()"
+        oninput="ssTextFilterChange('${col.key}', this.value)" />`;
+    }
+
+    return `<th${cls} onclick="ssToggleSort('${col.key}')">
+      ${col.label}<span class="ss-sort-arrow">${arrow}</span>
+      ${filterHtml}
+    </th>`;
+  }).join('') + '</tr>';
+}
+
+function renderSpreadsheetBody() {
+  const data = gatherSpreadsheetData();
+  const filtered = filterAndSortData(data);
+
+  const tbody = document.getElementById('ss-tbody');
+  tbody.innerHTML = filtered.map(row => {
+    return '<tr>' + SS_COLUMNS.map(col => {
+      const val = row[col.key];
+
+      // Type is always read-only badge
+      if (col.key === 'type') {
+        return `<td><span class="ss-type-badge ${row.type}">${row.type}</span></td>`;
+      }
+
+      if (!col.editable) {
+        if (col.key === 'age') {
+          return `<td style="text-align:right;opacity:0.6;">${val !== null ? val : '—'}</td>`;
+        }
+        return `<td>${escHtml(String(val ?? ''))}</td>`;
+      }
+
+      const iType = col.inputType || 'text';
+      const step = iType === 'number' ? (col.key === 'length' ? ' step="1"' : ' step="0.5"') : '';
+      const displayVal = escHtml(String(val ?? ''));
+      return `<td><input type="${iType}" value="${displayVal}"${step}
+        onchange="ssEditCell('${row.fieldId}','${row.rowId}','${row.plantingId}','${col.key}',this.value)" /></td>`;
+    }).join('') + '</tr>';
+  }).join('');
+
+  // Counts
+  const cropRows = filtered.filter(r => r.type === 'crop');
+  document.getElementById('ss-count').textContent =
+    `${filtered.length} rows shown (${cropRows.length} crop)`;
+  const totalArea = cropRows.reduce((s, r) => s + r.width * r.length, 0);
+  document.getElementById('ss-summary').textContent =
+    `Crop area: ${(totalArea / 43560).toFixed(2)} ac`;
+}
+
+function ssToggleSort(colKey) {
+  if (ssSort.col === colKey) {
+    ssSort.asc = !ssSort.asc;
+  } else {
+    ssSort.col = colKey;
+    ssSort.asc = true;
+  }
+  renderSpreadsheetFull();
+}
+
+function ssTextFilterChange(colKey, value) {
+  ssFilters[colKey] = value;
+  renderSpreadsheetBody();
+}
+
+function ssToggleDropdown(btn) {
+  const panel = btn.nextElementSibling;
+  // Close all other dropdowns first
+  document.querySelectorAll('.ss-dropdown-panel.open').forEach(p => {
+    if (p !== panel) p.classList.remove('open');
+  });
+  panel.classList.toggle('open');
+}
+
+function ssDropdownChange(colKey, checkbox) {
+  if (!Array.isArray(ssFilters[colKey])) ssFilters[colKey] = [];
+  const val = checkbox.value;
+  if (checkbox.checked) {
+    if (!ssFilters[colKey].includes(val)) ssFilters[colKey].push(val);
+  } else {
+    ssFilters[colKey] = ssFilters[colKey].filter(v => v !== val);
+  }
+  // Update button label
+  const btn = checkbox.closest('.ss-dropdown-filter').querySelector('.ss-dropdown-btn');
+  const count = ssFilters[colKey].length;
+  btn.textContent = count === 0 ? 'All' : count + ' selected';
+  renderSpreadsheetBody();
+}
+
+function ssDateFilterChange(colKey, which, value) {
+  if (typeof ssFilters[colKey] !== 'object' || Array.isArray(ssFilters[colKey])) {
+    ssFilters[colKey] = {};
+  }
+  ssFilters[colKey][which] = value || null;
+  renderSpreadsheetBody();
+}
+
+function ssRangeFilterChange(colKey, which, value) {
+  if (typeof ssFilters[colKey] !== 'object' || Array.isArray(ssFilters[colKey])) {
+    ssFilters[colKey] = {};
+  }
+  ssFilters[colKey][which] = value !== '' ? parseFloat(value) : null;
+  renderSpreadsheetBody();
+}
+
+function ssEditCell(fieldId, rowId, plantingId, colKey, value) {
+  snapshotForUndo();
+  const field = state.fields.find(f => f.id === fieldId);
+  if (!field) return;
+  const row = field.rows.find(r => r.id === rowId);
+  if (!row) return;
+
+  const col = SS_COLUMNS.find(c => c.key === colKey);
+  if (!col || !col.editable) return;
+
+  if (col.plantingField && plantingId) {
+    const planting = row.plantings && row.plantings.find(p => p.id === plantingId);
+    if (!planting) return;
+    planting[col.plantingField] = value || null;
+  } else if (col.editField) {
+    if (col.editField === 'width') {
+      const v = parseFloat(value);
+      if (!isNaN(v) && v > 0) { row.width = v; row.widthOverride = true; }
+    } else if (col.editField === 'length') {
+      const v = parseFloat(value);
+      if (!isNaN(v) && v > 0) { row.length = v; row.lengthOverride = true; }
+    } else if (col.editField === 'name') {
+      row.name = value;
+    }
+  }
+
+  persist();
+  renderSpreadsheetBody();
+  renderMap();
+  renderList();
+  updateStats();
+}
+
+function exportSpreadsheetCSV() {
+  const data = filterAndSortData(gatherSpreadsheetData());
+  const headers = SS_COLUMNS.map(c => c.label);
+  const csvRows = [headers.join(',')];
+  data.forEach(row => {
+    csvRows.push(SS_COLUMNS.map(col => {
+      let val = String(row[col.key] ?? '');
+      if (val.includes(',') || val.includes('"') || val.includes('\n')) {
+        val = '"' + val.replace(/"/g, '""') + '"';
+      }
+      return val;
+    }).join(','));
+  });
+  const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'twisted-river-farm-crops.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Close spreadsheet on Esc, close dropdowns on outside click
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('spreadsheet-overlay').classList.contains('open')) {
+    closeSpreadsheet();
+  }
+});
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.ss-dropdown-filter')) {
+    document.querySelectorAll('.ss-dropdown-panel.open').forEach(p => p.classList.remove('open'));
+  }
+});
+
+// Enter key in spreadsheet: commit current cell then move to same column in next row
+document.getElementById('ss-table').addEventListener('keydown', function(e) {
+  if (e.key !== 'Enter') return;
+  const input = e.target;
+  if (input.tagName !== 'INPUT' || !input.closest('tbody')) return;
+  e.preventDefault();
+  input.blur(); // triggers onchange to save
+  const td = input.closest('td');
+  const tr = td.closest('tr');
+  const colIdx = Array.from(tr.children).indexOf(td);
+  const nextTr = tr.nextElementSibling;
+  if (nextTr) {
+    const nextTd = nextTr.children[colIdx];
+    if (nextTd) {
+      const nextInput = nextTd.querySelector('input, select');
+      if (nextInput) { nextInput.focus(); nextInput.select(); }
+    }
+  }
 });
 </script>
 </body>

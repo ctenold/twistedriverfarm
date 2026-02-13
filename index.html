@@ -64,7 +64,9 @@
     font-weight: 600 !important;
     padding: 4px 8px !important;
     border-radius: 3px !important;
-    white-space: nowrap !important;
+    white-space: normal !important;
+    min-width: 300px !important;
+    max-width: 480px !important;
     box-shadow: 0 2px 6px rgba(0,0,0,0.4) !important;
   }
   .lane-tooltip::before { display: none !important; }
@@ -429,6 +431,14 @@
     box-shadow: 0 1px 4px rgba(0,0,0,0.4);
   }
 
+  .row-item.highlight {
+    animation: rowHighlight 1.5s ease-out;
+  }
+  @keyframes rowHighlight {
+    0%   { background: rgba(212, 168, 67, 0.35); }
+    100% { background: transparent; }
+  }
+
   #import-input { display: none; }
 
   .dim-tooltip {
@@ -476,6 +486,156 @@
     align-items: center;
     justify-content: center;
   }
+
+  /* Planting cards within crop rows */
+  .plantings-section {
+    margin-top: 6px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+
+  .planting-card {
+    background: rgba(74, 124, 63, 0.08);
+    border: 1px solid rgba(74, 124, 63, 0.2);
+    border-left: 3px solid #6b8f5e;
+    border-radius: 5px;
+    padding: 6px 8px;
+  }
+
+  .planting-header {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 4px;
+  }
+
+  .planting-header input.planting-crop-name {
+    flex: 1; min-width: 0;
+    background: none; border: none;
+    color: #8bc47a; font-size: 12px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; outline: none;
+    padding: 2px 4px; border-radius: 3px;
+  }
+  .planting-header input.planting-crop-name:focus {
+    background: rgba(255,255,255,0.06);
+  }
+
+  .planting-age {
+    font-size: 10px; color: #8bc47a; white-space: nowrap; flex-shrink: 0;
+  }
+
+  .planting-header button.delete-planting {
+    background: none; border: 1px solid rgba(255,255,255,0.08);
+    color: var(--bone); opacity: 0.4;
+    width: 20px; height: 20px; border-radius: 3px;
+    cursor: pointer; font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0;
+  }
+  .planting-header button.delete-planting:hover {
+    opacity: 1; border-color: var(--rust); color: var(--rust);
+  }
+
+  .planting-date-row {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 4px;
+  }
+
+  .planting-date-row label {
+    font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px;
+    color: var(--bone); opacity: 0.5; flex-shrink: 0;
+  }
+
+  .planting-date-row input[type="date"] {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--cream); padding: 2px 5px; border-radius: 4px;
+    font-size: 11px; font-family: 'DM Sans', sans-serif;
+    outline: none; color-scheme: dark;
+  }
+
+  .planting-notes-toggle {
+    background: none; border: none;
+    color: var(--bone); opacity: 0.5;
+    font-size: 9px; font-family: 'DM Sans', sans-serif;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    cursor: pointer; padding: 2px 0; margin-bottom: 2px;
+    transition: opacity 0.15s;
+  }
+  .planting-notes-toggle:hover { opacity: 0.8; }
+
+  .planting-notes-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+  }
+
+  .planting-note-group {
+    display: flex; flex-direction: column; gap: 1px;
+  }
+
+  .planting-note-group label {
+    font-size: 8px; text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--bone); opacity: 0.45;
+  }
+
+  .planting-note-group input {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--cream); padding: 3px 5px; border-radius: 3px;
+    font-size: 10px; font-family: 'DM Sans', sans-serif;
+    outline: none; width: 100%;
+  }
+  .planting-note-group input:focus {
+    border-color: var(--gold);
+  }
+
+  .add-planting-btn {
+    background: none;
+    border: 1px dashed rgba(74, 124, 63, 0.3);
+    color: #6b8f5e; opacity: 0.7;
+    font-size: 10px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    padding: 3px 8px; border-radius: 4px;
+    cursor: pointer; margin-top: 4px;
+    transition: all 0.15s;
+  }
+  .add-planting-btn:hover {
+    opacity: 1; border-color: #6b8f5e;
+    background: rgba(74, 124, 63, 0.1);
+  }
+
+  /* View-date calendar control on map */
+  .view-date-control {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    z-index: 1000;
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(44, 30, 15, 0.92);
+    border: 1px solid rgba(212, 168, 67, 0.35);
+    padding: 6px 14px; border-radius: 8px;
+    box-shadow: 0 3px 16px rgba(0,0,0,0.5);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .view-date-control label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--gold); opacity: 0.8; white-space: nowrap;
+  }
+  .view-date-control input[type="date"] {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(212, 168, 67, 0.3);
+    color: var(--cream); padding: 4px 8px; border-radius: 5px;
+    font-size: 12px; font-family: 'DM Sans', sans-serif;
+    outline: none; color-scheme: dark;
+  }
+  .view-date-control input[type="date"]:focus {
+    border-color: var(--gold);
+  }
+  .view-date-control button {
+    background: none; border: 1px solid rgba(212, 168, 67, 0.25);
+    color: var(--gold); padding: 3px 8px; border-radius: 4px;
+    font-size: 10px; font-weight: 600; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    transition: all 0.15s;
+  }
+  .view-date-control button:hover {
+    background: rgba(212, 168, 67, 0.15);
+    border-color: var(--gold);
+  }
 </style>
 </head>
 <body>
@@ -484,6 +644,12 @@
 
 <button id="panel-toggle" title="Toggle Panel">☰</button>
 <input type="file" id="import-input" accept=".json" />
+
+<div class="view-date-control">
+  <label>📅 View as of</label>
+  <input type="date" id="view-date-input" />
+  <button onclick="resetViewDate()">Today</button>
+</div>
 
 <div id="panel">
   <div class="panel-header">
@@ -506,6 +672,8 @@
       <button onclick="exportFieldJSON()" title="Export this field as JSON">Export Field</button>
       <button onclick="document.getElementById('import-input').click()" title="Import a field from JSON">Import Field</button>
       <button id="orientation-toggle" onclick="toggleOrientation()" title="Toggle row direction">⬍ Vertical</button>
+      <button id="toggle-notes-btn" onclick="toggleAllNotes()" title="Expand/Collapse all notes">▸ Notes</button>
+      <button id="toggle-lanes-btn" onclick="toggleAllLanes()" title="Show/Hide lanes in list">👁 Lanes</button>
     </div>
   </div>
 
@@ -570,6 +738,9 @@ const INITIAL_CROPS = [
 let state = loadState();
 let undoStack = [];
 let placementMode = null;    // { fieldId, ghostMarker, banner, onMove, onClick, onKey }
+let viewDate = null;         // null = today (default), or 'YYYY-MM-DD' string
+let allNotesExpanded = false;
+let lanesHidden = localStorage.getItem('twistedriver-lanesHidden') === 'true';
 
 // --- Map Setup ---
 const map = L.map('map', {
@@ -591,6 +762,18 @@ let inactiveLayers = [];   // outlines + markers for other fields
 // --- Init ---
 populateUI();
 renderAll();
+
+// --- View date control ---
+document.getElementById('view-date-input').value = todayStr();
+document.getElementById('view-date-input').addEventListener('change', function() {
+  viewDate = this.value || null;
+  renderMap();
+});
+function resetViewDate() {
+  viewDate = null;
+  document.getElementById('view-date-input').value = todayStr();
+  renderMap();
+}
 
 // --- Import handler ---
 document.getElementById('import-input').addEventListener('change', function(e) {
@@ -631,8 +814,9 @@ function loadState() {
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
-      // Already multi-field format
+      // Already multi-field format — migrate rows if needed
       if (parsed.fields && Array.isArray(parsed.fields)) {
+        parsed.fields.forEach(f => { f.rows = migrateRowsToPlantings(f.rows); });
         return parsed;
       }
       // Old single-field format → migrate
@@ -653,8 +837,26 @@ function migrateOldField(old) {
     defaultLaneWidth: old.defaultLaneWidth || DEFAULT_LANE_WIDTH,
     defaultCropWidth: old.defaultCropWidth || DEFAULT_CROP_WIDTH,
     defaultLength: old.defaultLength || DEFAULT_LENGTH,
-    rows: old.rows
+    rows: migrateRowsToPlantings(old.rows)
   };
+}
+
+function migrateRowsToPlantings(rows) {
+  return rows.map(row => {
+    if (row.type !== 'crop') return row;
+    if (row.plantings) return row; // already migrated
+    const planting = {
+      id: genId(),
+      cropName: row.name || 'New Crop',
+      plantDate: row.plantDate || null,
+      notes: row.notes || null,
+      fertilityNotes: null, harvestData: null, treatments: null
+    };
+    const migrated = { ...row, plantings: [planting] };
+    delete migrated.plantDate;
+    delete migrated.notes;
+    return migrated;
+  });
 }
 
 function buildInitialState() {
@@ -684,7 +886,12 @@ function buildDefaultField(name) {
     rows.push({
       id: genId(), type: 'crop', name: label,
       width: DEFAULT_CROP_WIDTH, length: DEFAULT_LENGTH,
-      widthOverride: false, lengthOverride: false
+      widthOverride: false, lengthOverride: false,
+      plantings: [{
+        id: genId(), cropName: label,
+        plantDate: null, notes: null,
+        fertilityNotes: null, harvestData: null, treatments: null
+      }]
     });
   });
 
@@ -757,6 +964,36 @@ function getDaysAge(plantDate) {
   today.setHours(0,0,0,0);
   const diff = Math.floor((today - planted) / 86400000);
   return diff;
+}
+
+function getPlantingAsOfDate(row) {
+  if (!row.plantings || row.plantings.length === 0) return null;
+  const cutoff = viewDate || todayStr();
+  // Find plantings on or before the view date
+  const eligible = row.plantings.filter(p => p.plantDate && p.plantDate <= cutoff);
+  if (eligible.length > 0) {
+    return eligible.reduce((a, b) => a.plantDate > b.plantDate ? a : b);
+  }
+  // If nothing planted yet as of cutoff, show the earliest future planting
+  const future = row.plantings.filter(p => p.plantDate && p.plantDate > cutoff);
+  if (future.length > 0) {
+    return future.reduce((a, b) => a.plantDate < b.plantDate ? a : b);
+  }
+  return row.plantings[row.plantings.length - 1];
+}
+
+function getLatestPlanting(row) {
+  if (!row.plantings || row.plantings.length === 0) return null;
+  const withDate = row.plantings.filter(p => p.plantDate);
+  if (withDate.length > 0) {
+    return withDate.reduce((a, b) => a.plantDate > b.plantDate ? a : b);
+  }
+  return row.plantings[row.plantings.length - 1];
+}
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
 // --- Geo helpers ---
@@ -959,6 +1196,11 @@ function populateUI() {
   // Orientation toggle
   const isVert = (field.orientation || 'vertical') === 'vertical';
   document.getElementById('orientation-toggle').textContent = isVert ? '⬍ Vertical' : '⬌ Horizontal';
+
+  // Lanes toggle button state
+  const lanesBtn = document.getElementById('toggle-lanes-btn');
+  lanesBtn.textContent = lanesHidden ? '👁‍🗨 Lanes' : '👁 Lanes';
+  lanesBtn.style.opacity = lanesHidden ? '0.5' : '1';
 }
 
 // --- State mutations (all operate on active field) ---
@@ -998,12 +1240,20 @@ function addRow(type) {
   const name = type === 'lane'
     ? `Lane ${field.rows.filter(r => r.type === 'lane').length + 1}`
     : `New Crop`;
-  field.rows.push({
+  const row = {
     id: genId(), type, name,
     width: type === 'lane' ? field.defaultLaneWidth : field.defaultCropWidth,
     length: field.defaultLength,
     widthOverride: false, lengthOverride: false
-  });
+  };
+  if (type === 'crop') {
+    row.plantings = [{
+      id: genId(), cropName: name,
+      plantDate: null, notes: null,
+      fertilityNotes: null, harvestData: null, treatments: null
+    }];
+  }
+  field.rows.push(row);
   saveState();
 }
 
@@ -1037,16 +1287,77 @@ function updateRowField(id, field, value) {
     if (!row.widthOverride) {
       row.width = value === 'lane' ? af.defaultLaneWidth : af.defaultCropWidth;
     }
+    if (value === 'crop' && !row.plantings) {
+      row.plantings = [{
+        id: genId(), cropName: row.name,
+        plantDate: null, notes: null,
+        fertilityNotes: null, harvestData: null, treatments: null
+      }];
+    }
   } else if (field === 'width') {
     const v = parseFloat(value);
     if (!isNaN(v) && v > 0) { row.width = v; row.widthOverride = true; }
   } else if (field === 'length') {
     const v = parseFloat(value);
     if (!isNaN(v) && v > 0) { row.length = v; row.lengthOverride = true; }
+  }
+  saveState();
+}
+
+function addPlanting(rowId) {
+  snapshotForUndo();
+  const row = activeField().rows.find(r => r.id === rowId);
+  if (!row || row.type !== 'crop') return;
+  if (!row.plantings) row.plantings = [];
+  row.plantings.push({
+    id: genId(), cropName: 'New Crop',
+    plantDate: null, notes: null,
+    fertilityNotes: null, harvestData: null, treatments: null
+  });
+  saveState();
+}
+
+function deletePlanting(rowId, plantingId) {
+  snapshotForUndo();
+  const row = activeField().rows.find(r => r.id === rowId);
+  if (!row || !row.plantings) return;
+  if (row.plantings.length <= 1) return; // keep at least one
+  row.plantings = row.plantings.filter(p => p.id !== plantingId);
+  // Update row name to latest planting
+  const latest = getLatestPlanting(row);
+  if (latest) row.name = latest.cropName;
+  saveState();
+}
+
+function updatePlanting(rowId, plantingId, field, value) {
+  snapshotForUndo();
+  const row = activeField().rows.find(r => r.id === rowId);
+  if (!row || !row.plantings) return;
+  const planting = row.plantings.find(p => p.id === plantingId);
+  if (!planting) return;
+
+  if (field === 'cropName') {
+    planting.cropName = value;
+    // Update row name to latest planting's crop name
+    const latest = getLatestPlanting(row);
+    if (latest) row.name = latest.cropName;
   } else if (field === 'plantDate') {
-    row.plantDate = value || null;
+    planting.plantDate = value || null;
+    // Re-evaluate latest planting for row name
+    const latest = getLatestPlanting(row);
+    if (latest) row.name = latest.cropName;
   } else if (field === 'notes') {
-    row.notes = value || null;
+    planting.notes = value || null;
+    persist(); renderMap(); return;
+  } else if (field === 'fertilityNotes') {
+    planting.fertilityNotes = value || null;
+    persist(); renderMap(); return;
+  } else if (field === 'harvestData') {
+    planting.harvestData = value || null;
+    persist(); renderMap(); return;
+  } else if (field === 'treatments') {
+    planting.treatments = value || null;
+    persist(); renderMap(); return;
   }
   saveState();
 }
@@ -1128,23 +1439,60 @@ function renderList() {
           title="Length (ft)" />
         <span class="row-dims">${row.width}×${row.length} ft</span>
       </div>
-      ${row.type === 'crop' ? `<div class="row-controls" style="margin-top:4px;">
-        <label style="font-size:10px;color:var(--bone);opacity:0.5;">Planted</label>
-        <input type="date" value="${row.plantDate || ''}"
-          onchange="updateRowField('${row.id}', 'plantDate', this.value)"
-          style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:var(--cream);padding:3px 6px;border-radius:4px;font-size:11px;font-family:'DM Sans',sans-serif;outline:none;color-scheme:dark;"
-          title="Plant date" />
-        ${(() => { const age = getDaysAge(row.plantDate); return age !== null ? '<span style="font-size:10px;color:#8bc47a;margin-left:auto;white-space:nowrap;">' + age + ' days old</span>' : ''; })()}
-      </div>
-      <div class="row-controls" style="margin-top:4px;">
-        <label style="font-size:10px;color:var(--bone);opacity:0.5;">Notes</label>
-        <input type="text" value="${escHtml(row.notes || '')}" placeholder="—"
-          onchange="updateRowField('${row.id}', 'notes', this.value)"
-          style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:var(--cream);padding:3px 6px;border-radius:4px;font-size:11px;font-family:'DM Sans',sans-serif;outline:none;text-align:left;width:auto;"
-          title="Notes" />
+      ${row.type === 'crop' && row.plantings ? `<div class="plantings-section">
+        ${row.plantings.map((p, pi) => `<div class="planting-card">
+          <div class="planting-header">
+            <input class="planting-crop-name" value="${escHtml(p.cropName)}"
+              onchange="updatePlanting('${row.id}', '${p.id}', 'cropName', this.value)"
+              placeholder="Crop name" />
+            ${(() => { const age = getDaysAge(p.plantDate); return age !== null ? '<span class="planting-age">' + age + 'd</span>' : ''; })()}
+            ${row.plantings.length > 1 ? `<button class="delete-planting" onclick="deletePlanting('${row.id}', '${p.id}')" title="Remove planting">✕</button>` : ''}
+          </div>
+          <div class="planting-date-row">
+            <label>Planted</label>
+            <input type="date" value="${p.plantDate || ''}"
+              onchange="updatePlanting('${row.id}', '${p.id}', 'plantDate', this.value)" />
+          </div>
+          <button class="planting-notes-toggle" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'grid' : 'none'; this.textContent = this.nextElementSibling.style.display === 'none' ? '▸ Notes' : '▾ Notes'">▸ Notes</button>
+          <div class="planting-notes-grid" style="display:none;">
+            <div class="planting-note-group">
+              <label>General</label>
+              <input type="text" value="${escHtml(p.notes || '')}" placeholder="—"
+                onchange="updatePlanting('${row.id}', '${p.id}', 'notes', this.value)" />
+            </div>
+            <div class="planting-note-group">
+              <label>Fertility</label>
+              <input type="text" value="${escHtml(p.fertilityNotes || '')}" placeholder="—"
+                onchange="updatePlanting('${row.id}', '${p.id}', 'fertilityNotes', this.value)" />
+            </div>
+            <div class="planting-note-group">
+              <label>Harvest</label>
+              <input type="text" value="${escHtml(p.harvestData || '')}" placeholder="—"
+                onchange="updatePlanting('${row.id}', '${p.id}', 'harvestData', this.value)" />
+            </div>
+            <div class="planting-note-group">
+              <label>Treatments</label>
+              <input type="text" value="${escHtml(p.treatments || '')}" placeholder="—"
+                onchange="updatePlanting('${row.id}', '${p.id}', 'treatments', this.value)" />
+            </div>
+          </div>
+        </div>`).join('')}
+        <button class="add-planting-btn" onclick="addPlanting('${row.id}')">+ Add Planting</button>
       </div>` : ''}
     </div>
   `).join('');
+
+  // Re-apply toggle states after DOM rebuild
+  if (allNotesExpanded) {
+    container.querySelectorAll('.planting-notes-grid').forEach(g => g.style.display = 'grid');
+    container.querySelectorAll('.planting-notes-toggle').forEach(t => t.textContent = '▾ Notes');
+  }
+  if (lanesHidden) {
+    container.querySelectorAll('.row-item').forEach(item => {
+      const badge = item.querySelector('.row-type-badge');
+      if (badge && badge.classList.contains('lane')) item.style.display = 'none';
+    });
+  }
 }
 
 function renderMap() {
@@ -1292,11 +1640,10 @@ function renderActiveField(field) {
     } else {
       const centerLat = (northLat + southLat) / 2;
       const centerLng = (westLng + eastLng) / 2;
-      const age = getDaysAge(row.plantDate);
+      const latest = getPlantingAsOfDate(row);
+      const labelName = latest ? latest.cropName : row.name;
+      const age = latest ? getDaysAge(latest.plantDate) : null;
       const ageStr = age !== null ? ` (${age}d)` : '';
-      const labelStyle = vert
-        ? 'writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg);'
-        : '';
       const labelMarker = L.marker([centerLat, centerLng], {
         icon: L.divIcon({
           className: '',
@@ -1315,24 +1662,40 @@ function renderActiveField(field) {
             border: 1px solid rgba(0, 0, 0, 0.15);
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
             line-height: 1;
-          ">${escHtml(row.name)}&nbsp;&nbsp;&nbsp;&nbsp;${ageStr}</div>`,
+          ">${escHtml(labelName)}&nbsp;&nbsp;&nbsp;&nbsp;${ageStr}</div>`,
           iconSize: [0, 0], iconAnchor: [0, 0]
         }),
         interactive: false
       }).addTo(map);
       activeLabelLayers.push(labelMarker);
 
-      // Hover tooltip showing plant date + notes
+      // Hover tooltip showing all plantings with all notes
       const tipParts = [];
-      if (row.plantDate) tipParts.push(`Planted: ${row.plantDate}`);
-      if (row.notes) tipParts.push(escHtml(row.notes));
+      if (row.plantings) {
+        row.plantings.forEach(p => {
+          const lines = [];
+          if (p.cropName) lines.push('<b>' + escHtml(p.cropName) + '</b>');
+          if (p.plantDate) {
+            const pAge = getDaysAge(p.plantDate);
+            lines.push('Planted: ' + p.plantDate + (pAge !== null ? ' (' + pAge + 'd)' : ''));
+          }
+          if (p.notes) lines.push('<b>Notes:</b> ' + escHtml(p.notes));
+          if (p.fertilityNotes) lines.push('<b>Fertility:</b> ' + escHtml(p.fertilityNotes));
+          if (p.harvestData) lines.push('<b>Harvest:</b> ' + escHtml(p.harvestData));
+          if (p.treatments) lines.push('<b>Treatments:</b> ' + escHtml(p.treatments));
+          if (lines.length) tipParts.push(lines.join('<br>'));
+        });
+      }
       if (tipParts.length) {
-        rect.bindTooltip(tipParts.join('<br>'), {
+        const sep = row.plantings.length > 1 ? '<br><hr style="border:none;border-top:1px solid rgba(0,0,0,0.15);margin:3px 0;"><br>' : '';
+        rect.bindTooltip(tipParts.join(sep), {
           permanent: false, direction: 'top', className: 'lane-tooltip',
           offset: [0, -10]
         });
       }
     }
+
+    rect.on('click', function() { scrollToRow(row.id); });
 
     activeLayers.push(rect);
     offsetFt += row.width;
@@ -1390,6 +1753,49 @@ function renderDimensions(field, totalWidthFt) {
     });
     activeDimLayers.push(lengthLine);
   }
+}
+
+// --- Scroll to row in panel ---
+function scrollToRow(rowId) {
+  // Open panel if collapsed
+  document.getElementById('panel').classList.remove('collapsed');
+  const el = document.querySelector(`.row-item[data-id="${rowId}"]`);
+  if (!el) return;
+  // Un-hide if lanes are hidden
+  if (el.style.display === 'none') el.style.display = '';
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  el.classList.remove('highlight');
+  // Force reflow to restart animation
+  void el.offsetWidth;
+  el.classList.add('highlight');
+}
+
+// --- Toggle All Notes ---
+function toggleAllNotes() {
+  allNotesExpanded = !allNotesExpanded;
+  const btn = document.getElementById('toggle-notes-btn');
+  btn.textContent = allNotesExpanded ? '▾ Notes' : '▸ Notes';
+  document.querySelectorAll('.planting-notes-grid').forEach(grid => {
+    grid.style.display = allNotesExpanded ? 'grid' : 'none';
+  });
+  document.querySelectorAll('.planting-notes-toggle').forEach(toggle => {
+    toggle.textContent = allNotesExpanded ? '▾ Notes' : '▸ Notes';
+  });
+}
+
+// --- Toggle All Lanes ---
+function toggleAllLanes() {
+  lanesHidden = !lanesHidden;
+  localStorage.setItem('twistedriver-lanesHidden', lanesHidden);
+  const btn = document.getElementById('toggle-lanes-btn');
+  btn.textContent = lanesHidden ? '👁‍🗨 Lanes' : '👁 Lanes';
+  btn.style.opacity = lanesHidden ? '0.5' : '1';
+  document.querySelectorAll('.row-item').forEach(item => {
+    const badge = item.querySelector('.row-type-badge');
+    if (badge && badge.classList.contains('lane')) {
+      item.style.display = lanesHidden ? 'none' : '';
+    }
+  });
 }
 
 // Panel toggle
